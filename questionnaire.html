@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2AB3A4">
+    <title>Brécey bouge autrement - Schéma cyclable</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-top">
+                <div class="header-logos">
+                    <img src="assets/logo-velo.png" alt="Brécey bouge autrement" class="header-logo logo-main">
+                    <img src="assets/logo-brecey.png" alt="Brécey Val de Sée" class="header-logo">
+                    <img src="assets/logo-wimoov.png" alt="Wimoov" class="header-logo">
+                    <img src="assets/logo-altermob.png" alt="Alter.Mob" class="header-logo">
+                </div>
+            </div>
+            <div class="header-bottom">
+                <div class="progress-container">
+                    <div class="progress-text">Étape <span id="current-step">1</span>/5</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Étape 1: Lieux importants -->
+        <section class="step step-with-map" id="step-1" data-step="1">
+            <div class="map-container">
+                <div id="map-1" class="map"></div>
+            </div>
+            <div class="form-container">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <h2 class="question">Quels lieux doivent être accessibles à vélo ?</h2>
+                </div>
+                <p class="instruction">Cliquez sur la carte pour placer un point, puis expliquez pourquoi ce lieu est important.</p>
+                
+                <div class="markers-list" id="markers-list-1"></div>
+                
+                <div class="input-group" id="input-group-1" style="display: none;">
+                    <label for="comment-1">Pourquoi ce lieu ? <span class="required">*</span></label>
+                    <textarea id="comment-1" placeholder="Ex: École primaire, beaucoup d'enfants à pied" rows="2"></textarea>
+                    <button class="btn btn-secondary" id="add-marker-1">
+                        <span class="btn-icon">+</span> Ajouter ce lieu
+                    </button>
+                </div>
+                
+                <button class="btn btn-primary btn-next" id="next-1" disabled>
+                    Étape suivante <span class="btn-arrow">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Étape 2: Points noirs -->
+        <section class="step step-with-map" id="step-2" data-step="2" style="display: none;">
+            <div class="map-container">
+                <div id="map-2" class="map"></div>
+            </div>
+            <div class="form-container">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <h2 class="question">Où y a-t-il des problèmes de sécurité ?</h2>
+                </div>
+                <p class="instruction">Cliquez sur la carte pour signaler un problème pour les vélos et piétons.</p>
+                
+                <div class="markers-list" id="markers-list-2"></div>
+                
+                <div class="input-group" id="input-group-2" style="display: none;">
+                    <label for="problem-type">Type de problème <span class="required">*</span></label>
+                    <select id="problem-type">
+                        <option value="">-- Choisir --</option>
+                        <option value="Carrefour ou croisement dangereux">Carrefour ou croisement dangereux</option>
+                        <option value="Vitesse excessive des véhicules">Vitesse excessive des véhicules</option>
+                        <option value="Manque de visibilité">Manque de visibilité</option>
+                        <option value="Absence de trottoir ou aménagement cyclable">Absence de trottoir ou aménagement cyclable</option>
+                        <option value="Chaussée en mauvais état">Chaussée en mauvais état</option>
+                        <option value="Éclairage insuffisant">Éclairage insuffisant</option>
+                        <option value="Conflit avec le stationnement">Conflit avec le stationnement</option>
+                        <option value="Circulation poids lourds">Circulation poids lourds</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                    
+                    <label for="comment-2">Précisez <span class="optional">(optionnel)</span></label>
+                    <textarea id="comment-2" placeholder="Ex: Visibilité nulle en sortant de la rue" rows="2"></textarea>
+                    
+                    <button class="btn btn-secondary" id="add-marker-2">
+                        <span class="btn-icon">+</span> Ajouter ce point noir
+                    </button>
+                </div>
+                
+                <button class="btn btn-primary btn-next" id="next-2" disabled>
+                    Étape suivante <span class="btn-arrow">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Étape 3: Itinéraires prioritaires -->
+        <section class="step step-form-only" id="step-3" data-step="3" style="display: none;">
+            <div class="form-container">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <h2 class="question">Quels trajets sont prioritaires ?</h2>
+                </div>
+                <p class="instruction">Cochez les liaisons qui devraient être accessibles à vélo en sécurité.</p>
+                
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Centre-bourg ↔ Écoles (maternelle/primaire)">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Centre-bourg ↔ Écoles (maternelle/primaire)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Centre-bourg ↔ Collège">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Centre-bourg ↔ Collège</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Centre-bourg ↔ Zone d'emploi Aptar / Ménardière">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Centre-bourg ↔ Zone d'emploi Aptar / Ménardière</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Centre-bourg ↔ Zone d'emploi La Lucerie">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Centre-bourg ↔ Zone d'emploi La Lucerie</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Centre-bourg ↔ Plan d'eau / espace loisirs">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Centre-bourg ↔ Plan d'eau / espace loisirs</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Centre-bourg ↔ Équipements sportifs (stade)">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Centre-bourg ↔ Équipements sportifs (stade)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Écoles ↔ Équipements sportifs">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Écoles ↔ Équipements sportifs</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="itineraire" value="Liaison vers les communes voisines">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">Liaison vers les communes voisines</span>
+                    </label>
+                </div>
+                
+                <div class="input-group">
+                    <label for="other-itineraire">Autre liaison à proposer ? <span class="optional">(optionnel)</span></label>
+                    <textarea id="other-itineraire" placeholder="Ex: Liaison vers Saint-Nicolas-des-Bois" rows="2"></textarea>
+                </div>
+                
+                <button class="btn btn-primary btn-next" id="next-3" disabled>
+                    Étape suivante <span class="btn-arrow">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Étape 4: Opportunités -->
+        <section class="step step-with-map" id="step-4" data-step="4" style="display: none;">
+            <div class="map-container">
+                <div id="map-4" class="map"></div>
+            </div>
+            <div class="form-container">
+                <div class="step-header">
+                    <span class="step-number">4</span>
+                    <h2 class="question">Des chemins ou opportunités à exploiter ?</h2>
+                </div>
+                <p class="instruction">Chemins ruraux, raccourcis, terrains communaux... Cliquez sur la carte pour les signaler.</p>
+                
+                <div class="markers-list" id="markers-list-4"></div>
+                
+                <div class="input-group" id="input-group-4" style="display: none;">
+                    <label for="comment-4">Décrivez cette opportunité <span class="required">*</span></label>
+                    <textarea id="comment-4" placeholder="Ex: Ancien chemin rural vers le plan d'eau" rows="2"></textarea>
+                    <button class="btn btn-secondary" id="add-marker-4">
+                        <span class="btn-icon">+</span> Ajouter cette opportunité
+                    </button>
+                </div>
+                
+                <button class="btn btn-primary btn-next" id="next-4">
+                    Étape suivante <span class="btn-arrow">→</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Étape 5: Priorité -->
+        <section class="step step-form-only" id="step-5" data-step="5" style="display: none;">
+            <div class="form-container">
+                <div class="step-header">
+                    <span class="step-number">5</span>
+                    <h2 class="question">Votre priorité n°1 pour le vélo à Brécey ?</h2>
+                </div>
+                <p class="instruction">Si vous deviez choisir UNE seule action, ce serait laquelle ?</p>
+                
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="priorite" value="Sécuriser les abords des écoles">
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">Sécuriser les abords des écoles</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="priorite" value="Créer une liaison vers les zones d'emploi">
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">Créer une liaison vers les zones d'emploi</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="priorite" value="Apaiser la circulation dans le centre-bourg">
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">Apaiser la circulation dans le centre-bourg</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="priorite" value="Développer les itinéraires de loisirs (plan d'eau, balades)">
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">Développer les itinéraires de loisirs</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="priorite" value="Autre">
+                        <span class="radio-custom"></span>
+                        <span class="radio-text">Autre</span>
+                    </label>
+                </div>
+                
+                <div class="input-group" id="other-priority-group" style="display: none;">
+                    <label for="other-priority">Précisez votre priorité <span class="required">*</span></label>
+                    <textarea id="other-priority" placeholder="Décrivez votre priorité" rows="2"></textarea>
+                </div>
+                
+                <button class="btn btn-primary btn-submit" id="submit" disabled>
+                    Terminer <span class="btn-icon">✓</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Écran de fin -->
+        <section class="step step-end" id="step-end" style="display: none;">
+            <div class="end-container">
+                <div class="end-icon">🎉</div>
+                <h2 class="end-title">Merci pour votre contribution !</h2>
+                <p class="end-message">Vos réponses ont bien été enregistrées et seront utilisées pour construire le schéma directeur cyclable de Brécey.</p>
+                
+                <div class="partners-logos">
+                    <img src="assets/logo-velo.png" alt="Brécey bouge autrement" class="partner-logo">
+                    <img src="assets/logo-brecey.png" alt="Brécey Val de Sée" class="partner-logo">
+                    <img src="assets/logo-wimoov.png" alt="Wimoov" class="partner-logo">
+                    <img src="assets/logo-altermob.png" alt="Alter.Mob" class="partner-logo">
+                </div>
+                
+                <div class="end-actions">
+                    <button class="btn btn-secondary" id="modify-responses">
+                        ← Modifier mes réponses
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+    
+    <!-- html2canvas -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
+    <!-- Application JS -->
+    <script src="js/storage.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
