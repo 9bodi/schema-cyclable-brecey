@@ -1,124 +1,128 @@
-/**
- * Storage Module
- * Gestion du stockage local et synchronisation
- */
+// Configuration Supabase
+const SUPABASE_URL = 'https://wtvfyoqagabofvzzlibd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dmZ5b3FhZ2Fib2Z2enpsaWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NDk1NzMsImV4cCI6MjA4OTQyNTU3M30.QjrySAyNlive-AldjxaS6zivALXICQlVrubnyCgqwFc';
 
 const Storage = {
     STORAGE_KEY: 'schema_cyclable_brecey',
-    PARTICIPANT_KEY: 'schema_cyclable_participant_id',
-    
-    /**
-     * Génère un ID unique pour le participant
-     */
+
+    // Génère un ID unique pour le participant
     generateParticipantId() {
-        return 'p_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+        return 'participant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     },
-    
-    /**
-     * Récupère ou crée l'ID du participant
-     */
-    getParticipantId() {
-        let id = localStorage.getItem(this.PARTICIPANT_KEY);
-        if (!id) {
-            id = this.generateParticipantId();
-            localStorage.setItem(this.PARTICIPANT_KEY, id);
-        }
-        return id;
-    },
-    
-    /**
-     * Récupère les données du participant courant
-     */
+
+    // Récupère ou crée les données du participant actuel
     getCurrentData() {
-        const allData = this.getAllContributions();
-        const participantId = this.getParticipantId();
-        return allData.find(d => d.participant_id === participantId) || this.createEmptyContribution();
-    },
-    
-    /**
-     * Crée une contribution vide
-     */
-    createEmptyContribution() {
+        let data = localStorage.getItem(this.STORAGE_KEY);
+        if (data) {
+            return JSON.parse(data);
+        }
+        // Nouvelles données
         return {
-            participant_id: this.getParticipantId(),
-            timestamp_start: new Date().toISOString(),
-            timestamp_end: null,
-            etape_1_lieux: [],
-            etape_2_points_noirs: [],
-            etape_3_itineraires: {
-                selections: [],
-                autre: null
-            },
-            etape_4_opportunites: [],
-            etape_5_priorite: {
-                choix: null,
-                autre: null
-            }
+            participant_id: this.generateParticipantId(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            etape1_lieux: [],
+            etape2_points_noirs: [],
+            etape3_itineraires: [],
+            etape4_opportunites: [],
+            etape5_priorite: null,
+            submitted: false
         };
     },
-    
-    /**
-     * Récupère toutes les contributions
-     */
-    getAllContributions() {
-        try {
-            const data = localStorage.getItem(this.STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
-        } catch (e) {
-            console.error('Erreur lecture localStorage:', e);
-            return [];
-        }
+
+    // Sauvegarde en local
+    saveData(data) {
+        data.updated_at = new Date().toISOString();
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+        console.log('Data saved locally', data);
     },
-    
-    /**
-     * Sauvegarde les données du participant courant
-     */
-    saveCurrentData(data) {
+
+    // Envoie à Supabase
+    async syncToSupabase(data) {
         try {
-            const allData = this.getAllContributions();
-            const participantId = this.getParticipantId();
-            const index = allData.findIndex(d => d.participant_id === participantId);
-            
-            data.participant_id = participantId;
-            
-            if (index >= 0) {
-                allData[index] = data;
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/contributions`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    participant_id: data.participant_id,
+                    data: data
+                })
+            });
+
+            if (response.ok) {
+                console.log('✅ Data synced to Supabase');
+                return true;
             } else {
-                allData.push(data);
+                const error = await response.text();
+                console.error('❌ Supabase sync failed:', error);
+                return false;
             }
-            
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allData));
-            return true;
-        } catch (e) {
-            console.error('Erreur sauvegarde localStorage:', e);
+        } catch (error) {
+            console.error('❌ Network error:', error);
             return false;
         }
     },
-    
-    /**
-     * Marque la contribution comme terminée
-     */
-    finishContribution(data) {
-        data.timestamp_end = new Date().toISOString();
-        return this.saveCurrentData(data);
+
+    // Récupère toutes les contributions depuis Supabase (pour admin)
+    async getAllContributions() {
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/contributions?select=*&order=created_at.desc`, {
+                method: 'GET',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+
+            if (response.ok) {
+                const contributions = await response.json();
+                console.log('✅ Fetched contributions from Supabase:', contributions.length);
+                return contributions;
+            } else {
+                console.error('❌ Failed to fetch contributions');
+                return [];
+            }
+        } catch (error) {
+            console.error('❌ Network error:', error);
+            return [];
+        }
     },
-    
-    /**
-     * Efface toutes les données (admin)
-     */
-    clearAll() {
+
+    // Soumission finale : sauvegarde local + sync Supabase
+    async submitFinal(data) {
+        data.submitted = true;
+        data.submitted_at = new Date().toISOString();
+        this.saveData(data);
+        
+        // Sync to Supabase
+        const synced = await this.syncToSupabase(data);
+        return synced;
+    },
+
+    // Réinitialise les données locales (nouveau questionnaire)
+    reset() {
         localStorage.removeItem(this.STORAGE_KEY);
+        console.log('Data reset');
     },
-    
-    /**
-     * Réinitialise la contribution du participant courant
-     */
-    resetCurrentParticipant() {
-        const allData = this.getAllContributions();
-        const participantId = this.getParticipantId();
-        const filtered = allData.filter(d => d.participant_id !== participantId);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filtered));
-        // Génère un nouvel ID pour recommencer
-        localStorage.removeItem(this.PARTICIPANT_KEY);
+
+    // Récupère toutes les contributions locales (fallback)
+    getAllLocalContributions() {
+        const contributions = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(this.STORAGE_KEY)) {
+                try {
+                    contributions.push(JSON.parse(localStorage.getItem(key)));
+                } catch (e) {
+                    console.error('Error parsing contribution', e);
+                }
+            }
+        }
+        return contributions;
     }
 };

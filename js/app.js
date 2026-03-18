@@ -79,11 +79,11 @@ const App = {
         switch(stepNumber) {
             case 1:
                 btn = document.getElementById('next-1');
-                isValid = this.data.etape_1_lieux.length > 0;
+                isValid = this.data.etape1_lieux.length > 0;
                 break;
             case 2:
                 btn = document.getElementById('next-2');
-                isValid = this.data.etape_2_points_noirs.length > 0;
+                isValid = this.data.etape2_points_noirs.length > 0;
                 break;
             case 3:
                 btn = document.getElementById('next-3');
@@ -212,9 +212,9 @@ const App = {
      */
     loadMarkersForStep(stepNumber) {
         const configs = {
-            1: { data: this.data.etape_1_lieux, color: '#3B82F6' },
-            2: { data: this.data.etape_2_points_noirs, color: '#EF4444' },
-            4: { data: this.data.etape_4_opportunites, color: '#F59E0B' }
+            1: { data: this.data.etape1_lieux, color: '#3B82F6' },
+            2: { data: this.data.etape2_points_noirs, color: '#EF4444' },
+            4: { data: this.data.etape4_opportunites, color: '#F59E0B' }
         };
         
         const config = configs[stepNumber];
@@ -229,30 +229,31 @@ const App = {
     loadStepData(stepNumber) {
         switch(stepNumber) {
             case 1:
-                this.renderMarkersList(1, this.data.etape_1_lieux, 'lieu');
+                this.renderMarkersList(1, this.data.etape1_lieux, 'lieu');
                 break;
             case 2:
-                this.renderMarkersList(2, this.data.etape_2_points_noirs, 'point-noir');
+                this.renderMarkersList(2, this.data.etape2_points_noirs, 'point-noir');
                 break;
             case 3:
-                const sel = this.data.etape_3_itineraires.selections || [];
+                const sel = this.data.etape3_itineraires.selections || [];
                 document.querySelectorAll('input[name="itineraire"]').forEach(cb => {
                     cb.checked = sel.includes(cb.value);
                 });
-                document.getElementById('other-itineraire').value = this.data.etape_3_itineraires.autre || '';
+                const otherField = document.getElementById('other-itineraire');
+                if (otherField) otherField.value = this.data.etape3_itineraires.autre || '';
                 break;
             case 4:
-                this.renderMarkersList(4, this.data.etape_4_opportunites, 'opportunite');
+                this.renderMarkersList(4, this.data.etape4_opportunites, 'opportunite');
                 break;
             case 5:
-                const choix = this.data.etape_5_priorite.choix;
+                const choix = this.data.etape5_priorite?.choix;
                 if (choix) {
                     const radio = document.querySelector(`input[name="priorite"][value="${choix}"]`);
                     if (radio) {
                         radio.checked = true;
                         if (choix === 'Autre') {
                             document.getElementById('other-priority-group').style.display = 'block';
-                            document.getElementById('other-priority').value = this.data.etape_5_priorite.autre || '';
+                            document.getElementById('other-priority').value = this.data.etape5_priorite.autre || '';
                         }
                     }
                 }
@@ -294,16 +295,16 @@ const App = {
      */
     deleteMarker(stepNumber, index) {
         const configs = {
-            1: { array: 'etape_1_lieux', class: 'lieu' },
-            2: { array: 'etape_2_points_noirs', class: 'point-noir' },
-            4: { array: 'etape_4_opportunites', class: 'opportunite' }
+            1: { array: 'etape1_lieux', class: 'lieu' },
+            2: { array: 'etape2_points_noirs', class: 'point-noir' },
+            4: { array: 'etape4_opportunites', class: 'opportunite' }
         };
         
         const config = configs[stepNumber];
         this.data[config.array].splice(index, 1);
         MapManager.removeMarker(`map-${stepNumber}`, index);
         this.renderMarkersList(stepNumber, this.data[config.array], config.class);
-        Storage.saveCurrentData(this.data);
+        Storage.saveData(this.data);
         this.updateButtonState(stepNumber);
         this.showToast('Point supprimé');
     },
@@ -326,9 +327,9 @@ const App = {
         const result = MapManager.confirmTempMarker('map-1', '#3B82F6');
         if (!result) return;
         
-        this.data.etape_1_lieux.push({ lat: result.lat, lng: result.lng, pourquoi: comment });
-        Storage.saveCurrentData(this.data);
-        this.renderMarkersList(1, this.data.etape_1_lieux, 'lieu');
+        this.data.etape1_lieux.push({ lat: result.lat, lng: result.lng, pourquoi: comment });
+        Storage.saveData(this.data);
+        this.renderMarkersList(1, this.data.etape1_lieux, 'lieu');
         this.updateButtonState(1);
         
         document.getElementById('comment-1').value = '';
@@ -356,9 +357,9 @@ const App = {
         const result = MapManager.confirmTempMarker('map-2', '#EF4444');
         if (!result) return;
         
-        this.data.etape_2_points_noirs.push({ lat: result.lat, lng: result.lng, type, commentaire: comment });
-        Storage.saveCurrentData(this.data);
-        this.renderMarkersList(2, this.data.etape_2_points_noirs, 'point-noir');
+        this.data.etape2_points_noirs.push({ lat: result.lat, lng: result.lng, type, commentaire: comment });
+        Storage.saveData(this.data);
+        this.renderMarkersList(2, this.data.etape2_points_noirs, 'point-noir');
         this.updateButtonState(2);
         
         document.getElementById('problem-type').value = '';
@@ -386,9 +387,9 @@ const App = {
         const result = MapManager.confirmTempMarker('map-4', '#F59E0B');
         if (!result) return;
         
-        this.data.etape_4_opportunites.push({ lat: result.lat, lng: result.lng, description: desc });
-        Storage.saveCurrentData(this.data);
-        this.renderMarkersList(4, this.data.etape_4_opportunites, 'opportunite');
+        this.data.etape4_opportunites.push({ lat: result.lat, lng: result.lng, description: desc });
+        Storage.saveData(this.data);
+        this.renderMarkersList(4, this.data.etape4_opportunites, 'opportunite');
         this.updateButtonState(4);
         
         document.getElementById('comment-4').value = '';
@@ -403,8 +404,8 @@ const App = {
     saveStep3() {
         const selections = Array.from(document.querySelectorAll('input[name="itineraire"]:checked')).map(cb => cb.value);
         const autre = document.getElementById('other-itineraire')?.value.trim();
-        this.data.etape_3_itineraires = { selections, autre: autre || null };
-        Storage.saveCurrentData(this.data);
+        this.data.etape3_itineraires = { selections, autre: autre || null };
+        Storage.saveData(this.data);
     },
     
     /**
@@ -413,30 +414,53 @@ const App = {
     saveStep5() {
         const selected = document.querySelector('input[name="priorite"]:checked');
         const autre = document.getElementById('other-priority')?.value.trim();
-        this.data.etape_5_priorite = {
+        this.data.etape5_priorite = {
             choix: selected?.value || null,
             autre: selected?.value === 'Autre' ? autre : null
         };
-        Storage.saveCurrentData(this.data);
+        Storage.saveData(this.data);
     },
     
     /**
-     * Soumet le formulaire
+     * Soumet le formulaire avec sync Supabase
      */
-    submitForm() {
+    async submitForm() {
+        // Validation étape 5
+        const prioritySelected = document.querySelector('input[name="priorite"]:checked');
+        if (!prioritySelected) {
+            this.showToast('Veuillez sélectionner une priorité', 'error');
+            return;
+        }
+
         this.saveStep5();
-        Storage.finishContribution(this.data);
-        
+
+        // Soumission avec sync Supabase
+        const submitBtn = document.getElementById('submit');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Envoi en cours...';
+        submitBtn.disabled = true;
+
+        const synced = await Storage.submitFinal(this.data);
+
+        // Masquer toutes les étapes
         document.querySelectorAll('.step').forEach(s => {
             s.classList.remove('active');
             s.style.display = 'none';
         });
-        
-        document.getElementById('step-end').style.display = 'flex';
-        document.getElementById('step-end').classList.add('active');
+
+        // Afficher écran de fin
+        const endScreen = document.getElementById('step-end');
+        if (endScreen) {
+            endScreen.style.display = 'flex';
+            endScreen.classList.add('active');
+        }
         document.querySelector('.progress-container').style.display = 'none';
-        
-        this.showToast('Merci pour votre contribution !');
+
+        if (synced) {
+            this.showToast('Merci ! Votre contribution a été enregistrée.', 'success');
+        } else {
+            this.showToast('Contribution enregistrée localement', 'warning');
+        }
     },
     
     /**
@@ -444,24 +468,32 @@ const App = {
      */
     restartForm() {
         if (confirm('Voulez-vous vraiment recommencer ?')) {
-            Storage.resetCurrentParticipant();
+            Storage.reset();
             this.data = Storage.getCurrentData();
+            this.initialized = false;
             document.querySelector('.progress-container').style.display = 'flex';
+            
+            // Réinitialiser les cartes
+            MapManager.maps = {};
+            MapManager.markers = {};
+            MapManager.tempMarkers = {};
+            
             this.showStep(1);
         }
     },
     
     /**
-     * Toast
+     * Toast notification
      */
-    showToast(message) {
+    showToast(message, type = 'info') {
         document.querySelector('.toast')?.remove();
         const toast = document.createElement('div');
-        toast.className = 'toast';
+        toast.className = `toast toast-${type}`;
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
 };
 
+// Démarrage
 document.addEventListener('DOMContentLoaded', () => App.init());
