@@ -370,6 +370,12 @@
             border-radius: 50%;
         }
         
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--color-text-light);
+        }
+        
         @media (max-width: 768px) {
             .admin-content {
                 flex-direction: column;
@@ -400,8 +406,7 @@
                 </div>
                 <div class="admin-actions">
                     <button class="admin-btn" id="refresh-btn">🔄 Actualiser</button>
-                    <button class="admin-btn" id="clear-btn">🗑️ Effacer tout</button>
-                    <a href="index.html" class="admin-btn">← Questionnaire</a>
+                    <a href="index.html" class="admin-btn">← Accueil</a>
                 </div>
             </div>
         </header>
@@ -484,10 +489,7 @@
                 
                 <div class="contributions-list" id="contributions-list">
                     <h3 class="filter-title">📝 Contributions</h3>
-                    <div class="no-data" id="no-data">
-                        <div class="no-data-icon">📭</div>
-                        <p>Aucune contribution</p>
-                    </div>
+                    <div class="loading">Chargement...</div>
                 </div>
             </aside>
         </div>
@@ -498,7 +500,6 @@
             crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="js/storage.js"></script>
-    <script src="js/export.js"></script>
     
     <script>
         const BRECEY_CENTER = [48.726, -1.166];
@@ -506,6 +507,7 @@
         
         let adminMap;
         let allMarkers = { lieux: [], pointsNoirs: [], opportunites: [] };
+        let allData = [];
         let filteredData = [];
         
         function initAdminMap() {
@@ -549,11 +551,12 @@
         }
         
         function filterDataByDate(data) {
+            if (!Array.isArray(data)) return [];
             const startDate = document.getElementById('date-start').value;
             const endDate = document.getElementById('date-end').value;
             if (!startDate && !endDate) return data;
             return data.filter(c => {
-                const d = new Date(c.timestamp_start || c.timestamp_end);
+                const d = new Date(c.created_at);
                 if (isNaN(d)) return true;
                 const ds = d.toISOString().split('T')[0];
                 if (startDate && ds < startDate) return false;
@@ -562,10 +565,25 @@
             });
         }
         
-        function loadContributions() {
-            const allData = Storage.getAllContributions();
+        async function loadContributions() {
+            const list = document.getElementById('contributions-list');
+            list.innerHTML = '<h3 class="filter-title">📝 Contributions</h3><div class="loading">Chargement...</div>';
+            
+            try {
+                allData = await Storage.getAllContributions();
+                console.log('Data loaded:', allData);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                allData = [];
+            }
+            
+            if (!Array.isArray(allData)) {
+                allData = [];
+            }
+            
             filteredData = filterDataByDate(allData);
             
+            // Clear existing markers
             Object.values(allMarkers).forEach(arr => arr.forEach(m => adminMap.removeLayer(m)));
             allMarkers = { lieux: [], pointsNoirs: [], opportunites: [] };
             
@@ -573,35 +591,36 @@
             let html = '';
             
             filteredData.forEach(c => {
-                const dateStr = c.timestamp_start ? new Date(c.timestamp_start).toLocaleDateString('fr-FR') : '';
+                const data = c.data || c;
+                const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '';
                 
-                if (c.etape_1_lieux) {
-                    c.etape_1_lieux.forEach(l => {
+                if (data.etape1_lieux && Array.isArray(data.etape1_lieux)) {
+                    data.etape1_lieux.forEach(l => {
                         stats.lieux++;
                         const m = L.marker([l.lat, l.lng], { icon: createColoredMarker('#3B82F6') })
-                            .bindPopup(`<strong>Lieu important</strong><br>${l.pourquoi}`);
+                            .bindPopup(`<strong>Lieu important</strong><br>${l.pourquoi || ''}`);
                         allMarkers.lieux.push(m);
-                        html += `<div class="contribution-item lieu"><div class="contribution-type">🔵 Lieu</div><div class="contribution-text">${l.pourquoi}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                        html += `<div class="contribution-item lieu"><div class="contribution-type">🔵 Lieu</div><div class="contribution-text">${l.pourquoi || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
                     });
                 }
                 
-                if (c.etape_2_points_noirs) {
-                    c.etape_2_points_noirs.forEach(p => {
+                if (data.etape2_points_noirs && Array.isArray(data.etape2_points_noirs)) {
+                    data.etape2_points_noirs.forEach(p => {
                         stats.pointsNoirs++;
                         const m = L.marker([p.lat, p.lng], { icon: createColoredMarker('#E53935') })
-                            .bindPopup(`<strong>${p.type}</strong><br>${p.commentaire || ''}`);
+                            .bindPopup(`<strong>${p.type || 'Point noir'}</strong><br>${p.commentaire || ''}`);
                         allMarkers.pointsNoirs.push(m);
-                        html += `<div class="contribution-item point-noir"><div class="contribution-type">🔴 ${p.type}</div><div class="contribution-text">${p.commentaire || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                        html += `<div class="contribution-item point-noir"><div class="contribution-type">🔴 ${p.type || 'Point noir'}</div><div class="contribution-text">${p.commentaire || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
                     });
                 }
                 
-                if (c.etape_4_opportunites) {
-                    c.etape_4_opportunites.forEach(o => {
+                if (data.etape4_opportunites && Array.isArray(data.etape4_opportunites)) {
+                    data.etape4_opportunites.forEach(o => {
                         stats.opportunites++;
                         const m = L.marker([o.lat, o.lng], { icon: createColoredMarker('#F59E0B') })
-                            .bindPopup(`<strong>Opportunité</strong><br>${o.description}`);
+                            .bindPopup(`<strong>Opportunité</strong><br>${o.description || ''}`);
                         allMarkers.opportunites.push(m);
-                        html += `<div class="contribution-item opportunite"><div class="contribution-type">🟡 Opportunité</div><div class="contribution-text">${o.description}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                        html += `<div class="contribution-item opportunite"><div class="contribution-type">🟡 Opportunité</div><div class="contribution-text">${o.description || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
                     });
                 }
             });
@@ -611,14 +630,10 @@
             document.getElementById('stat-points-noirs').textContent = stats.pointsNoirs;
             document.getElementById('stat-opportunites').textContent = stats.opportunites;
             
-            const list = document.getElementById('contributions-list');
-            const noData = document.getElementById('no-data');
-            
             if (html) {
-                noData.style.display = 'none';
                 list.innerHTML = `<h3 class="filter-title">📝 Contributions (${stats.lieux + stats.pointsNoirs + stats.opportunites})</h3>` + html;
             } else {
-                list.innerHTML = `<h3 class="filter-title">📝 Contributions</h3><div class="no-data" id="no-data"><div class="no-data-icon">📭</div><p>Aucune contribution</p></div>`;
+                list.innerHTML = `<h3 class="filter-title">📝 Contributions</h3><div class="no-data"><div class="no-data-icon">📭</div><p>Aucune contribution</p></div>`;
             }
             
             applyTypeFilters();
@@ -647,19 +662,78 @@
             loadContributions();
         }
         
+        function exportCSV() {
+            if (filteredData.length === 0) { alert('Aucune donnée à exporter.'); return; }
+            
+            let csv = 'Type,Description,Latitude,Longitude,Date\n';
+            
+            filteredData.forEach(c => {
+                const data = c.data || c;
+                const dateStr = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR') : '';
+                
+                if (data.etape1_lieux) {
+                    data.etape1_lieux.forEach(l => {
+                        csv += `"Lieu important","${(l.pourquoi || '').replace(/"/g, '""')}",${l.lat},${l.lng},"${dateStr}"\n`;
+                    });
+                }
+                if (data.etape2_points_noirs) {
+                    data.etape2_points_noirs.forEach(p => {
+                        csv += `"Point noir - ${p.type || ''}","${(p.commentaire || '').replace(/"/g, '""')}",${p.lat},${p.lng},"${dateStr}"\n`;
+                    });
+                }
+                if (data.etape4_opportunites) {
+                    data.etape4_opportunites.forEach(o => {
+                        csv += `"Opportunité","${(o.description || '').replace(/"/g, '""')}",${o.lat},${o.lng},"${dateStr}"\n`;
+                    });
+                }
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `brecey-contributions-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+        
+        function exportJSON() {
+            if (filteredData.length === 0) { alert('Aucune donnée à exporter.'); return; }
+            const blob = new Blob([JSON.stringify(filteredData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `brecey-contributions-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+        
+        async function exportImage() {
+            try {
+                const canvas = await html2canvas(document.getElementById('admin-map'));
+                const link = document.createElement('a');
+                link.download = `brecey-carte-${new Date().toISOString().split('T')[0]}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            } catch (error) {
+                alert('Erreur lors de la capture.');
+                console.error(error);
+            }
+        }
+        
+        // Event listeners
         document.getElementById('filter-lieux').addEventListener('change', applyTypeFilters);
         document.getElementById('filter-points-noirs').addEventListener('change', applyTypeFilters);
         document.getElementById('filter-opportunites').addEventListener('change', applyTypeFilters);
         document.getElementById('date-start').addEventListener('change', () => { document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active')); loadContributions(); });
         document.getElementById('date-end').addEventListener('change', () => { document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active')); loadContributions(); });
         document.querySelectorAll('.date-preset').forEach(b => b.addEventListener('click', () => setDatePreset(b.dataset.preset)));
-        document.getElementById('refresh-btn').addEventListener('click', () => { loadContributions(); alert('Actualisé !'); });
-        document.getElementById('clear-btn').addEventListener('click', () => { if (confirm('Effacer toutes les données ?')) { Storage.clearAll(); loadContributions(); alert('Effacé.'); } });
-        document.getElementById('export-csv').addEventListener('click', () => { if (filteredData.length === 0) { alert('Aucune donnée.'); return; } ExportUtils.exportCSV(filteredData); });
-        document.getElementById('export-json').addEventListener('click', () => { if (filteredData.length === 0) { alert('Aucune donnée.'); return; } ExportUtils.exportJSON(filteredData); });
-        document.getElementById('export-image').addEventListener('click', () => ExportUtils.captureMap('admin-map'));
+        document.getElementById('refresh-btn').addEventListener('click', async () => { await loadContributions(); alert('Actualisé !'); });
+        document.getElementById('export-csv').addEventListener('click', exportCSV);
+        document.getElementById('export-json').addEventListener('click', exportJSON);
+        document.getElementById('export-image').addEventListener('click', exportImage);
         
-        document.addEventListener('DOMContentLoaded', () => { initAdminMap(); loadContributions(); });
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            initAdminMap();
+            await loadContributions();
+        });
     </script>
 </body>
 </html>
