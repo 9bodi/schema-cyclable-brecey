@@ -41,48 +41,34 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            padding: 30px 20px;
+            justify-content: center;
+            gap: 25px;
+            padding: 20px;
             text-align: center;
             height: 100%;
         }
 
-        /* Section haute */
-        .top-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* Logo vélo avec contour turquoise */
+        .logo-velo {
+            width: 130px;
+            height: auto;
+            animation: float 3s ease-in-out infinite;
+            border-radius: 16px;
+            border: 3px solid var(--color-primary);
+            padding: 10px;
+            background: white;
+            transition: all 0.3s ease;
         }
 
-       /* Logo vélo avec contour turquoise */
-.logo-velo {
-    width: 140px;
-    height: auto;
-    animation: float 3s ease-in-out infinite;
-    border-radius: 16px;
-    border: 3px solid var(--color-primary);
-    padding: 10px;
-    background: white;
-    transition: all 0.3s ease;
-}
-
-.logo-velo:hover {
-    border-color: #229487;
-    box-shadow: 0 8px 25px rgba(42, 179, 164, 0.4);
-    transform: scale(1.05);
-}
+        .logo-velo:hover {
+            border-color: #229487;
+            box-shadow: 0 8px 25px rgba(42, 179, 164, 0.4);
+            transform: scale(1.05);
+        }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
-        }
-
-        /* Section centrale */
-        .center-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
         }
 
         /* Description courte */
@@ -93,33 +79,33 @@
             line-height: 1.5;
         }
 
-       /* Bouton CTA turquoise */
-.cta-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--color-primary) 0%, #229487 100%);
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 700;
-    padding: 16px 45px;
-    border-radius: 50px;
-    text-decoration: none;
-    box-shadow: 0 6px 20px rgba(42, 179, 164, 0.4);
-    transition: all 0.3s ease;
-}
+        /* Bouton CTA turquoise */
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #229487 100%);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 16px 45px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 6px 20px rgba(42, 179, 164, 0.4);
+            transition: all 0.3s ease;
+        }
 
-.cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(42, 179, 164, 0.5);
-}
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(42, 179, 164, 0.5);
+        }
 
         /* Section basse */
         .bottom-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         /* Wimoov */
@@ -127,21 +113,21 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 3px;
         }
 
         .wimoov-logo {
-            height: 55px;
+            height: 45px;
         }
 
         .wimoov-text {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--color-wimoov);
         }
 
         .wimoov-slogan {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             font-style: italic;
             color: var(--color-text-light);
         }
@@ -151,25 +137,28 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
         }
 
         .partner-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--color-text-light);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .partner-logo {
-            height: 35px;
+            height: 30px;
             opacity: 0.9;
         }
 
         /* Responsive tablette/desktop */
         @media (min-width: 500px) {
+            .main-container {
+                gap: 30px;
+            }
             .logo-velo {
-                width: 180px;
+                width: 160px;
                 padding: 15px;
             }
             .description {
@@ -181,37 +170,28 @@
                 padding: 18px 55px;
             }
             .wimoov-logo {
-                height: 70px;
+                height: 55px;
             }
-        }
-
-        @media (min-height: 700px) {
-            .main-container {
-                padding: 50px 20px;
-            }
-            .logo-velo {
-                width: 160px;
+            .partner-logo {
+                height: 35px;
             }
         }
     </style>
 </head>
 <body>
     <main class="main-container">
-        <!-- Haut : Logo campagne -->
-        <div class="top-section">
-            <img src="assets/logo-velo.png" alt="Brécey bouge autrement" class="logo-velo">
-        </div>
+        <!-- Logo campagne -->
+        <img src="assets/logo-velo.png" alt="Brécey bouge autrement" class="logo-velo">
 
-        <!-- Centre : Description + Bouton -->
-        <div class="center-section">
-            <p class="description">
-                Votre avis compte pour améliorer les déplacements à vélo !
-            </p>
-            <a href="questionnaire.html" class="cta-button">
+        <!-- Description -->
+        <p class="description">
+            Votre avis compte pour améliorer les déplacements à vélo !
+        </p>
 
-                Je participe !
-            </a>
-        </div>
+        <!-- Bouton -->
+        <a href="questionnaire.html" class="cta-button">
+            Je participe !
+        </a>
 
         <!-- Bas : Wimoov + Partenaire -->
         <div class="bottom-section">
