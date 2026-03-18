@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2AB3A4">
+    <title>Admin - Brécey bouge autrement</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --color-primary: #2AB3A4;
+            --color-primary-dark: #239489;
+            --color-text: #2D3748;
+            --color-text-light: #718096;
+            --color-bg: #F7FAFC;
+            --color-border: #E2E8F0;
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-bg);
+        }
+        
+        .admin-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #20A090 100%);
+            color: white;
+            padding: 12px 20px;
+        }
+        
+        .admin-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .admin-header-logos {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .admin-header-logo {
+            height: 32px;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        
+        .admin-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .admin-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-family: inherit;
+        }
+        
+        .admin-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .admin-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .admin-map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #admin-map {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .admin-sidebar {
+            width: 380px;
+            background: white;
+            border-left: 1px solid var(--color-border);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .filter-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .filter-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 10px;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .filter-option input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+        
+        .filter-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .filter-dot.blue { background: #3B82F6; }
+        .filter-dot.red { background: #E53935; }
+        .filter-dot.yellow { background: #F59E0B; }
+        
+        .date-filter {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .date-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .date-row label {
+            font-size: 0.8rem;
+            color: var(--color-text-light);
+            min-width: 30px;
+        }
+        
+        .date-row input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+        }
+        
+        .date-row input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        
+        .date-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        
+        .date-preset {
+            background: var(--color-bg);
+            border: 1px solid var(--color-border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .date-preset:hover {
+            background: var(--color-border);
+        }
+        
+        .date-preset.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+        
+        .stats-section {
+            background: var(--color-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-light);
+        }
+        
+        .contributions-list {
+            margin-top: 20px;
+        }
+        
+        .contribution-item {
+            background: var(--color-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3B82F6;
+        }
+        
+        .contribution-item.point-noir {
+            border-left-color: #E53935;
+        }
+        
+        .contribution-item.opportunite {
+            border-left-color: #F59E0B;
+        }
+        
+        .contribution-type {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--color-text-light);
+            margin-bottom: 4px;
+        }
+        
+        .contribution-text {
+            font-size: 0.875rem;
+            color: var(--color-text);
+        }
+        
+        .contribution-meta {
+            font-size: 0.75rem;
+            color: var(--color-text-light);
+            margin-top: 4px;
+        }
+        
+        .export-section {
+            border-top: 1px solid var(--color-border);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .export-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .export-btn.csv {
+            background: #10B981;
+            color: white;
+        }
+        
+        .export-btn.json {
+            background: #8B5CF6;
+            color: white;
+        }
+        
+        .export-btn.image {
+            background: #F59E0B;
+            color: white;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--color-text-light);
+        }
+        
+        .no-data-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .map-legend {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            font-size: 0.75rem;
+        }
+        
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-content {
+                flex-direction: column;
+            }
+            
+            .admin-sidebar {
+                width: 100%;
+                max-height: 50vh;
+                border-left: none;
+                border-top: 1px solid var(--color-border);
+            }
+            
+            .admin-map-container {
+                height: 50vh;
+            }
+        }
+        
+        .leaflet-control-attribution { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <div class="admin-header-top">
+                <div class="admin-header-logos">
+                    <img src="assets/logo-velo.png" alt="Brécey bouge autrement" class="admin-header-logo">
+                    <span class="admin-title">Administration</span>
+                </div>
+                <div class="admin-actions">
+                    <button class="admin-btn" id="refresh-btn">🔄 Actualiser</button>
+                    <button class="admin-btn" id="clear-btn">🗑️ Effacer tout</button>
+                    <a href="index.html" class="admin-btn">← Questionnaire</a>
+                </div>
+            </div>
+        </header>
+        
+        <div class="admin-content">
+            <div class="admin-map-container">
+                <div id="admin-map"></div>
+            </div>
+            
+            <aside class="admin-sidebar">
+                <div class="filter-section">
+                    <h3 class="filter-title">📅 Filtrer par date</h3>
+                    <div class="date-filter">
+                        <div class="date-row">
+                            <label>Du</label>
+                            <input type="date" id="date-start">
+                        </div>
+                        <div class="date-row">
+                            <label>Au</label>
+                            <input type="date" id="date-end">
+                        </div>
+                        <div class="date-presets">
+                            <button class="date-preset" data-preset="today">Aujourd'hui</button>
+                            <button class="date-preset" data-preset="week">7 jours</button>
+                            <button class="date-preset" data-preset="month">30 jours</button>
+                            <button class="date-preset active" data-preset="all">Tout</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <h3 class="filter-title">🎯 Filtrer par type</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" id="filter-lieux" checked>
+                            <span class="filter-dot blue"></span>
+                            <span>Lieux importants</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="filter-points-noirs" checked>
+                            <span class="filter-dot red"></span>
+                            <span>Points noirs</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="filter-opportunites" checked>
+                            <span class="filter-dot yellow"></span>
+                            <span>Opportunités</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <h3 class="filter-title">📊 Statistiques</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-participants">0</div>
+                            <div class="stat-label">Participants</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-lieux">0</div>
+                            <div class="stat-label">Lieux</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-points-noirs">0</div>
+                            <div class="stat-label">Points noirs</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="stat-opportunites">0</div>
+                            <div class="stat-label">Opportunités</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="export-section">
+                    <h3 class="filter-title">💾 Exporter</h3>
+                    <button class="export-btn csv" id="export-csv">📊 CSV</button>
+                    <button class="export-btn json" id="export-json">📋 JSON</button>
+                    <button class="export-btn image" id="export-image">📷 Capture</button>
+                </div>
+                
+                <div class="contributions-list" id="contributions-list">
+                    <h3 class="filter-title">📝 Contributions</h3>
+                    <div class="no-data" id="no-data">
+                        <div class="no-data-icon">📭</div>
+                        <p>Aucune contribution</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/export.js"></script>
+    
+    <script>
+        const BRECEY_CENTER = [48.726, -1.166];
+        const ZOOM_LEVEL = 15;
+        
+        let adminMap;
+        let allMarkers = { lieux: [], pointsNoirs: [], opportunites: [] };
+        let filteredData = [];
+        
+        function initAdminMap() {
+            adminMap = L.map('admin-map', {
+                center: BRECEY_CENTER,
+                zoom: ZOOM_LEVEL,
+                zoomControl: true,
+                attributionControl: false
+            });
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(adminMap);
+            
+            const legend = L.control({ position: 'bottomleft' });
+            legend.onAdd = function() {
+                const div = L.DomUtil.create('div', 'map-legend');
+                div.innerHTML = `
+                    <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>Lieux importants</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#E53935;"></div>Points noirs</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>Opportunités</div>
+                `;
+                return div;
+            };
+            legend.addTo(adminMap);
+            
+            setTimeout(() => {
+                adminMap.invalidateSize();
+                adminMap.setView(BRECEY_CENTER, ZOOM_LEVEL);
+            }, 100);
+        }
+        
+        function createColoredMarker(color) {
+            return L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="background-color:${color};width:24px;height:24px;border-radius:50%;border:3px solid white;box-shadow:0 2px 5px rgba(0,0,0,0.3);"></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+        }
+        
+        function filterDataByDate(data) {
+            const startDate = document.getElementById('date-start').value;
+            const endDate = document.getElementById('date-end').value;
+            if (!startDate && !endDate) return data;
+            return data.filter(c => {
+                const d = new Date(c.timestamp_start || c.timestamp_end);
+                if (isNaN(d)) return true;
+                const ds = d.toISOString().split('T')[0];
+                if (startDate && ds < startDate) return false;
+                if (endDate && ds > endDate) return false;
+                return true;
+            });
+        }
+        
+        function loadContributions() {
+            const allData = Storage.getAllContributions();
+            filteredData = filterDataByDate(allData);
+            
+            Object.values(allMarkers).forEach(arr => arr.forEach(m => adminMap.removeLayer(m)));
+            allMarkers = { lieux: [], pointsNoirs: [], opportunites: [] };
+            
+            let stats = { participants: filteredData.length, lieux: 0, pointsNoirs: 0, opportunites: 0 };
+            let html = '';
+            
+            filteredData.forEach(c => {
+                const dateStr = c.timestamp_start ? new Date(c.timestamp_start).toLocaleDateString('fr-FR') : '';
+                
+                if (c.etape_1_lieux) {
+                    c.etape_1_lieux.forEach(l => {
+                        stats.lieux++;
+                        const m = L.marker([l.lat, l.lng], { icon: createColoredMarker('#3B82F6') })
+                            .bindPopup(`<strong>Lieu important</strong><br>${l.pourquoi}`);
+                        allMarkers.lieux.push(m);
+                        html += `<div class="contribution-item lieu"><div class="contribution-type">🔵 Lieu</div><div class="contribution-text">${l.pourquoi}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                    });
+                }
+                
+                if (c.etape_2_points_noirs) {
+                    c.etape_2_points_noirs.forEach(p => {
+                        stats.pointsNoirs++;
+                        const m = L.marker([p.lat, p.lng], { icon: createColoredMarker('#E53935') })
+                            .bindPopup(`<strong>${p.type}</strong><br>${p.commentaire || ''}`);
+                        allMarkers.pointsNoirs.push(m);
+                        html += `<div class="contribution-item point-noir"><div class="contribution-type">🔴 ${p.type}</div><div class="contribution-text">${p.commentaire || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                    });
+                }
+                
+                if (c.etape_4_opportunites) {
+                    c.etape_4_opportunites.forEach(o => {
+                        stats.opportunites++;
+                        const m = L.marker([o.lat, o.lng], { icon: createColoredMarker('#F59E0B') })
+                            .bindPopup(`<strong>Opportunité</strong><br>${o.description}`);
+                        allMarkers.opportunites.push(m);
+                        html += `<div class="contribution-item opportunite"><div class="contribution-type">🟡 Opportunité</div><div class="contribution-text">${o.description}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                    });
+                }
+            });
+            
+            document.getElementById('stat-participants').textContent = stats.participants;
+            document.getElementById('stat-lieux').textContent = stats.lieux;
+            document.getElementById('stat-points-noirs').textContent = stats.pointsNoirs;
+            document.getElementById('stat-opportunites').textContent = stats.opportunites;
+            
+            const list = document.getElementById('contributions-list');
+            const noData = document.getElementById('no-data');
+            
+            if (html) {
+                noData.style.display = 'none';
+                list.innerHTML = `<h3 class="filter-title">📝 Contributions (${stats.lieux + stats.pointsNoirs + stats.opportunites})</h3>` + html;
+            } else {
+                list.innerHTML = `<h3 class="filter-title">📝 Contributions</h3><div class="no-data" id="no-data"><div class="no-data-icon">📭</div><p>Aucune contribution</p></div>`;
+            }
+            
+            applyTypeFilters();
+        }
+        
+        function applyTypeFilters() {
+            const showL = document.getElementById('filter-lieux').checked;
+            const showP = document.getElementById('filter-points-noirs').checked;
+            const showO = document.getElementById('filter-opportunites').checked;
+            allMarkers.lieux.forEach(m => showL ? m.addTo(adminMap) : adminMap.removeLayer(m));
+            allMarkers.pointsNoirs.forEach(m => showP ? m.addTo(adminMap) : adminMap.removeLayer(m));
+            allMarkers.opportunites.forEach(m => showO ? m.addTo(adminMap) : adminMap.removeLayer(m));
+        }
+        
+        function setDatePreset(preset) {
+            const today = new Date();
+            let start = '', end = today.toISOString().split('T')[0];
+            if (preset === 'today') start = end;
+            else if (preset === 'week') { const d = new Date(today); d.setDate(d.getDate() - 7); start = d.toISOString().split('T')[0]; }
+            else if (preset === 'month') { const d = new Date(today); d.setDate(d.getDate() - 30); start = d.toISOString().split('T')[0]; }
+            else { start = ''; end = ''; }
+            document.getElementById('date-start').value = start;
+            document.getElementById('date-end').value = end;
+            document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-preset="${preset}"]`).classList.add('active');
+            loadContributions();
+        }
+        
+        document.getElementById('filter-lieux').addEventListener('change', applyTypeFilters);
+        document.getElementById('filter-points-noirs').addEventListener('change', applyTypeFilters);
+        document.getElementById('filter-opportunites').addEventListener('change', applyTypeFilters);
+        document.getElementById('date-start').addEventListener('change', () => { document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active')); loadContributions(); });
+        document.getElementById('date-end').addEventListener('change', () => { document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active')); loadContributions(); });
+        document.querySelectorAll('.date-preset').forEach(b => b.addEventListener('click', () => setDatePreset(b.dataset.preset)));
+        document.getElementById('refresh-btn').addEventListener('click', () => { loadContributions(); alert('Actualisé !'); });
+        document.getElementById('clear-btn').addEventListener('click', () => { if (confirm('Effacer toutes les données ?')) { Storage.clearAll(); loadContributions(); alert('Effacé.'); } });
+        document.getElementById('export-csv').addEventListener('click', () => { if (filteredData.length === 0) { alert('Aucune donnée.'); return; } ExportUtils.exportCSV(filteredData); });
+        document.getElementById('export-json').addEventListener('click', () => { if (filteredData.length === 0) { alert('Aucune donnée.'); return; } ExportUtils.exportJSON(filteredData); });
+        document.getElementById('export-image').addEventListener('click', () => ExportUtils.captureMap('admin-map'));
+        
+        document.addEventListener('DOMContentLoaded', () => { initAdminMap(); loadContributions(); });
+    </script>
+</body>
+</html>

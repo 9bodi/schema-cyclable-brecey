@@ -1,0 +1,659 @@
+/* ============================================
+   BRÉCEY BOUGE AUTREMENT - STYLES
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --color-primary: #2AB3A4;
+    --color-primary-dark: #239489;
+    --color-primary-light: #E8F8F6;
+    --color-accent: #4CAF50;
+    --color-danger: #E53935;
+    --color-danger-light: #FFEBEE;
+    --color-warning: #F59E0B;
+    --color-warning-light: #FFF8E1;
+    --color-text: #2D3748;
+    --color-text-light: #718096;
+    --color-bg: #F7FAFC;
+    --color-white: #FFFFFF;
+    --color-border: #E2E8F0;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--color-white);
+}
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--color-text);
+    line-height: 1.5;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #20A090 100%);
+    color: white;
+    padding: 10px 16px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow-md);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-top {
+    margin-bottom: 10px;
+}
+
+.header-logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.header-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.header-logo.logo-main {
+    height: 38px;
+}
+
+.header-bottom {
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.progress-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 20%;
+}
+
+/* ============================================
+   MAIN
+   ============================================ */
+.main-content {
+    position: fixed;
+    top: 105px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-white);
+}
+
+.step {
+    display: none;
+    height: 100%;
+    width: 100%;
+}
+
+.step.active {
+    display: block;
+}
+
+/* ============================================
+   STEP WITH MAP
+   ============================================ */
+.step-with-map {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.step-with-map .map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.step-with-map .form-container {
+    background: var(--color-white);
+    padding: 16px 20px 20px 20px;
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+    max-height: 48vh;
+    overflow-y: auto;
+}
+
+.map {
+    height: 100%;
+    width: 100%;
+}
+
+/* ============================================
+   STEP FORM ONLY
+   ============================================ */
+.step-form-only {
+    height: 100%;
+    overflow-y: auto;
+    background: var(--color-bg);
+}
+
+.step-form-only .form-container {
+    background: var(--color-white);
+    padding: 20px;
+    min-height: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   STEP HEADER
+   ============================================ */
+.step-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.step-number {
+    background: var(--color-primary);
+    color: white;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.question {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    line-height: 1.3;
+    flex: 1;
+}
+
+.instruction {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    margin-bottom: 16px;
+    padding-left: 40px;
+}
+
+.required { color: var(--color-danger); }
+.optional { color: var(--color-text-light); font-weight: 400; }
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+.input-group {
+    margin-bottom: 14px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 6px;
+}
+
+textarea, select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: all 0.2s;
+}
+
+textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: var(--color-white);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+textarea {
+    resize: none;
+    min-height: 56px;
+}
+
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%23718096' d='M7 7l3 3 3-3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+}
+
+/* ============================================
+   CHECKBOXES & RADIOS
+   ============================================ */
+.checkbox-group, .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.checkbox-label, .radio-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.checkbox-label:hover, .radio-label:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.checkbox-label:has(input:checked),
+.radio-label:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+}
+
+.checkbox-label input, .radio-label input {
+    position: absolute;
+    opacity: 0;
+}
+
+.checkbox-custom, .radio-custom {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 2px solid var(--color-border);
+    background: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.checkbox-custom { border-radius: 6px; }
+.radio-custom { border-radius: 50%; }
+
+.checkbox-label:has(input:checked) .checkbox-custom,
+.radio-label:has(input:checked) .radio-custom {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.checkbox-label:has(input:checked) .checkbox-custom::after {
+    content: '✓';
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.radio-label:has(input:checked) .radio-custom::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+.checkbox-text, .radio-text {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    line-height: 1.4;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 50px;
+    width: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(42, 179, 164, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(42, 179, 164, 0.45);
+}
+
+.btn-primary:disabled,
+.btn-disabled {
+    background: var(--color-border) !important;
+    color: var(--color-text-light) !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.btn-secondary {
+    background: var(--color-bg);
+    color: var(--color-text);
+    border: 2px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    background: var(--color-border);
+}
+
+.btn-next { margin-top: 14px; }
+.btn-icon { font-size: 1rem; }
+.btn-arrow { font-size: 1.1rem; }
+
+/* ============================================
+   MARKERS LIST
+   ============================================ */
+.markers-list {
+    margin-bottom: 12px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.no-markers {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    text-align: center;
+    padding: 10px;
+    font-style: italic;
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+}
+
+.marker-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--color-primary-light);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+}
+
+.marker-item.point-noir {
+    background: var(--color-danger-light);
+    border-color: var(--color-danger);
+}
+
+.marker-item.opportunite {
+    background: var(--color-warning-light);
+    border-color: var(--color-warning);
+}
+
+.marker-icon { font-size: 0.9rem; }
+
+.marker-text {
+    flex: 1;
+    color: var(--color-text);
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+.marker-delete {
+    background: none;
+    border: none;
+    color: var(--color-text-light);
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 1.1rem;
+    line-height: 1;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.marker-delete:hover {
+    background: var(--color-danger);
+    color: white;
+}
+
+/* ============================================
+   END SCREEN
+   ============================================ */
+.step-end {
+    display: none;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, #D4F1EE 100%);
+    overflow-y: auto;
+}
+
+.step-end.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.end-container {
+    text-align: center;
+    padding: 40px 24px;
+    max-width: 450px;
+}
+
+.end-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.end-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    margin-bottom: 12px;
+}
+
+.end-message {
+    font-size: 1rem;
+    color: var(--color-text);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.partners-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: var(--radius-md);
+}
+
+.partner-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.end-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ============================================
+   TOAST
+   ============================================ */
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-text);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    z-index: 10000;
+    animation: slideUp 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ============================================
+   LEAFLET
+   ============================================ */
+.custom-marker { background: transparent; border: none; }
+.marker-temp { animation: pulse 1.5s ease-in-out infinite; }
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.leaflet-control-zoom { border: none !important; box-shadow: var(--shadow-sm) !important; }
+.leaflet-control-zoom a { border-radius: var(--radius-sm) !important; }
+.leaflet-control-attribution { display: none !important; }
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (min-width: 768px) {
+    .header { padding: 12px 24px; }
+    .header-logo { height: 36px; }
+    .header-logo.logo-main { height: 42px; }
+    .header-logos { gap: 20px; }
+    .main-content { top: 115px; }
+    
+    .step-with-map .form-container {
+        max-width: 480px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+}
+
+@media (min-width: 1024px) {
+    .main-content { top: 110px; }
+    
+    .step-with-map .form-container {
+        position: absolute;
+        right: 20px;
+        left: auto;
+        top: 20px;
+        bottom: 20px;
+        max-height: calc(100% - 40px);
+        width: 400px;
+        max-width: 400px;
+        transform: none;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+    }
+}
+
+/* ============================================
+   LOADING
+   ============================================ */
+.loading {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
