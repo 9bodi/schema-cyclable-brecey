@@ -14,7 +14,12 @@ const Storage = {
     getCurrentData() {
         let data = localStorage.getItem(this.STORAGE_KEY);
         if (data) {
-            return JSON.parse(data);
+            const parsed = JSON.parse(data);
+            // S'assurer que etape5_stationnements existe (migration)
+            if (!parsed.etape5_stationnements) {
+                parsed.etape5_stationnements = [];
+            }
+            return parsed;
         }
         // Nouvelles données
         return {
@@ -23,9 +28,9 @@ const Storage = {
             updated_at: new Date().toISOString(),
             etape1_lieux: [],
             etape2_points_noirs: [],
-            etape3_itineraires: [],
+            etape3_itineraires: { selections: [], autre: null },
             etape4_opportunites: [],
-            etape5_priorite: null,
+            etape5_stationnements: [],
             submitted: false
         };
     },

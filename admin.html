@@ -30,6 +30,8 @@
             --color-text-light: #718096;
             --color-bg: #F7FAFC;
             --color-border: #E2E8F0;
+            --color-success: #10B981;
+            --color-warning: #F59E0B;
         }
         
         body {
@@ -55,7 +57,6 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 10px;
         }
         
         .admin-header-logos {
@@ -100,6 +101,11 @@
             background: rgba(255,255,255,0.3);
         }
         
+        .admin-btn.active {
+            background: white;
+            color: var(--color-primary);
+        }
+        
         .admin-content {
             display: flex;
             flex: 1;
@@ -117,11 +123,50 @@
         }
         
         .admin-sidebar {
-            width: 380px;
+            width: 400px;
             background: white;
             border-left: 1px solid var(--color-border);
             overflow-y: auto;
             padding: 20px;
+        }
+        
+        /* Mode toggle */
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--color-border);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .mode-btn.active {
+            border-color: var(--color-primary);
+            background: var(--color-primary);
+            color: white;
+        }
+        
+        .mode-btn:hover:not(.active) {
+            border-color: var(--color-primary);
+        }
+        
+        /* Panels */
+        .panel {
+            display: none;
+        }
+        
+        .panel.active {
+            display: block;
         }
         
         .filter-section {
@@ -167,6 +212,7 @@
         .filter-dot.blue { background: #3B82F6; }
         .filter-dot.red { background: #E53935; }
         .filter-dot.yellow { background: #F59E0B; }
+        .filter-dot.green { background: #10B981; }
         
         .date-filter {
             display: flex;
@@ -237,7 +283,7 @@
         
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
         }
         
@@ -246,13 +292,13 @@
         }
         
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--color-primary);
         }
         
         .stat-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--color-text-light);
         }
         
@@ -268,12 +314,16 @@
             border-left: 4px solid #3B82F6;
         }
         
-        .contribution-item.point-noir {
+        .contribution-item.securite {
             border-left-color: #E53935;
         }
         
         .contribution-item.opportunite {
             border-left-color: #F59E0B;
+        }
+        
+        .contribution-item.stationnement {
+            border-left-color: #10B981;
         }
         
         .contribution-type {
@@ -376,6 +426,164 @@
             color: var(--color-text-light);
         }
         
+        /* Saisie manuelle */
+        .manual-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--color-bg);
+            border-radius: 12px;
+        }
+        
+        .manual-section h4 {
+            font-size: 0.875rem;
+            color: var(--color-text);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .manual-input-group {
+            margin-bottom: 12px;
+        }
+        
+        .manual-input-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--color-text-light);
+            margin-bottom: 4px;
+        }
+        
+        .manual-input-group input,
+        .manual-input-group select,
+        .manual-input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+        }
+        
+        .manual-input-group input:focus,
+        .manual-input-group select:focus,
+        .manual-input-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        
+        .manual-coords {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .manual-coords input {
+            flex: 1;
+        }
+        
+        .manual-add-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+        
+        .manual-add-btn:hover {
+            background: var(--color-primary-dark);
+        }
+        
+        .manual-marker-list {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .manual-marker-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .manual-marker-delete {
+            background: #E53935;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .manual-submit-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--color-primary);
+        }
+        
+        .manual-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+        }
+        
+        .manual-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .manual-reset-btn {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            color: var(--color-text-light);
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-family: inherit;
+            margin-top: 10px;
+        }
+        
+        .manual-success {
+            background: #D1FAE5;
+            color: #065F46;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .click-instruction {
+            background: #FEF3C7;
+            color: #92400E;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
         @media (max-width: 768px) {
             .admin-content {
                 flex-direction: column;
@@ -390,6 +598,10 @@
             
             .admin-map-container {
                 height: 50vh;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
@@ -417,79 +629,169 @@
             </div>
             
             <aside class="admin-sidebar">
-                <div class="filter-section">
-                    <h3 class="filter-title">📅 Filtrer par date</h3>
-                    <div class="date-filter">
-                        <div class="date-row">
-                            <label>Du</label>
-                            <input type="date" id="date-start">
+                <!-- Mode toggle -->
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="mode-view">📊 Visualiser</button>
+                    <button class="mode-btn" id="mode-manual">✏️ Saisie manuelle</button>
+                </div>
+                
+                <!-- Panel Visualisation -->
+                <div class="panel active" id="panel-view">
+                    <div class="filter-section">
+                        <h3 class="filter-title">📅 Filtrer par date</h3>
+                        <div class="date-filter">
+                            <div class="date-row">
+                                <label>Du</label>
+                                <input type="date" id="date-start">
+                            </div>
+                            <div class="date-row">
+                                <label>Au</label>
+                                <input type="date" id="date-end">
+                            </div>
+                            <div class="date-presets">
+                                <button class="date-preset" data-preset="today">Aujourd'hui</button>
+                                <button class="date-preset" data-preset="week">7 jours</button>
+                                <button class="date-preset" data-preset="month">30 jours</button>
+                                <button class="date-preset active" data-preset="all">Tout</button>
+                            </div>
                         </div>
-                        <div class="date-row">
-                            <label>Au</label>
-                            <input type="date" id="date-end">
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h3 class="filter-title">🎯 Filtrer par type</h3>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-lieux" checked>
+                                <span class="filter-dot blue"></span>
+                                <span>Lieux importants</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-securite" checked>
+                                <span class="filter-dot red"></span>
+                                <span>Sécurité</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-opportunites" checked>
+                                <span class="filter-dot yellow"></span>
+                                <span>Opportunités</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-stationnements" checked>
+                                <span class="filter-dot green"></span>
+                                <span>Stationnements</span>
+                            </label>
                         </div>
-                        <div class="date-presets">
-                            <button class="date-preset" data-preset="today">Aujourd'hui</button>
-                            <button class="date-preset" data-preset="week">7 jours</button>
-                            <button class="date-preset" data-preset="month">30 jours</button>
-                            <button class="date-preset active" data-preset="all">Tout</button>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h3 class="filter-title">📊 Statistiques</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-participants">0</div>
+                                <div class="stat-label">Participants</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-lieux">0</div>
+                                <div class="stat-label">Lieux</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-securite">0</div>
+                                <div class="stat-label">Sécurité</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-opportunites">0</div>
+                                <div class="stat-label">Opportunités</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-stationnements">0</div>
+                                <div class="stat-label">Stationnements</div>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <div class="export-section">
+                        <h3 class="filter-title">💾 Exporter</h3>
+                        <button class="export-btn csv" id="export-csv">📊 CSV</button>
+                        <button class="export-btn json" id="export-json">📋 JSON</button>
+                        <button class="export-btn image" id="export-image">📷 Capture</button>
+                    </div>
+                    
+                    <div class="contributions-list" id="contributions-list">
+                        <h3 class="filter-title">📝 Contributions</h3>
+                        <div class="loading">Chargement...</div>
                     </div>
                 </div>
                 
-                <div class="filter-section">
-                    <h3 class="filter-title">🎯 Filtrer par type</h3>
-                    <div class="filter-options">
-                        <label class="filter-option">
-                            <input type="checkbox" id="filter-lieux" checked>
-                            <span class="filter-dot blue"></span>
-                            <span>Lieux importants</span>
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" id="filter-points-noirs" checked>
-                            <span class="filter-dot red"></span>
-                            <span>Points noirs</span>
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" id="filter-opportunites" checked>
-                            <span class="filter-dot yellow"></span>
-                            <span>Opportunités</span>
-                        </label>
+                <!-- Panel Saisie manuelle -->
+                <div class="panel" id="panel-manual">
+                    <div id="manual-success" class="manual-success" style="display: none;">
+                        ✅ Questionnaire enregistré !
                     </div>
-                </div>
-                
-                <div class="stats-section">
-                    <h3 class="filter-title">📊 Statistiques</h3>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <div class="stat-value" id="stat-participants">0</div>
-                            <div class="stat-label">Participants</div>
+                    
+                    <p class="click-instruction">💡 Cliquez sur la carte pour placer des points</p>
+                    
+                    <!-- Étape 1: Lieux -->
+                    <div class="manual-section">
+                        <h4>🔵 1. Lieux importants (1-3)</h4>
+                        <div class="manual-input-group">
+                            <label>Pourquoi ce lieu ?</label>
+                            <textarea id="manual-lieu-text" rows="2" placeholder="Ex: École primaire"></textarea>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="stat-lieux">0</div>
-                            <div class="stat-label">Lieux</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="stat-points-noirs">0</div>
-                            <div class="stat-label">Points noirs</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="stat-opportunites">0</div>
-                            <div class="stat-label">Opportunités</div>
-                        </div>
+                        <button class="manual-add-btn" id="manual-add-lieu">+ Ajouter le lieu (clic carte)</button>
+                        <div class="manual-marker-list" id="manual-lieux-list"></div>
                     </div>
-                </div>
-                
-                <div class="export-section">
-                    <h3 class="filter-title">💾 Exporter</h3>
-                    <button class="export-btn csv" id="export-csv">📊 CSV</button>
-                    <button class="export-btn json" id="export-json">📋 JSON</button>
-                    <button class="export-btn image" id="export-image">📷 Capture</button>
-                </div>
-                
-                <div class="contributions-list" id="contributions-list">
-                    <h3 class="filter-title">📝 Contributions</h3>
-                    <div class="loading">Chargement...</div>
+                    
+                    <!-- Étape 2: Sécurité -->
+                    <div class="manual-section">
+                        <h4>🔴 2. Problèmes de sécurité (1-3)</h4>
+                        <div class="manual-input-group">
+                            <label>Type de problème</label>
+                            <select id="manual-securite-type">
+                                <option value="">-- Choisir --</option>
+                                <option value="Carrefour ou croisement dangereux">Carrefour dangereux</option>
+                                <option value="Vitesse excessive">Vitesse excessive</option>
+                                <option value="Manque de visibilité">Manque de visibilité</option>
+                                <option value="Absence d'aménagement">Absence d'aménagement</option>
+                                <option value="Chaussée en mauvais état">Chaussée en mauvais état</option>
+                                <option value="Éclairage insuffisant">Éclairage insuffisant</option>
+                                <option value="Autre">Autre</option>
+                            </select>
+                        </div>
+                        <div class="manual-input-group">
+                            <label>Commentaire (optionnel)</label>
+                            <input type="text" id="manual-securite-comment" placeholder="Précisions...">
+                        </div>
+                        <button class="manual-add-btn" id="manual-add-securite">+ Ajouter le point (clic carte)</button>
+                        <div class="manual-marker-list" id="manual-securite-list"></div>
+                    </div>
+                    
+                    <!-- Étape 4: Opportunités -->
+                    <div class="manual-section">
+                        <h4>🟡 4. Opportunités (0-3, optionnel)</h4>
+                        <div class="manual-input-group">
+                            <label>Description</label>
+                            <textarea id="manual-opportunite-text" rows="2" placeholder="Ex: Chemin rural..."></textarea>
+                        </div>
+                        <button class="manual-add-btn" id="manual-add-opportunite">+ Ajouter (clic carte)</button>
+                        <div class="manual-marker-list" id="manual-opportunites-list"></div>
+                    </div>
+                    
+                    <!-- Étape 5: Stationnements -->
+                    <div class="manual-section">
+                        <h4>🟢 5. Stationnements souhaités (1-3)</h4>
+                        <div class="manual-input-group">
+                            <label>Pourquoi cet emplacement ?</label>
+                            <textarea id="manual-stationnement-text" rows="2" placeholder="Ex: Devant la mairie..."></textarea>
+                        </div>
+                        <button class="manual-add-btn" id="manual-add-stationnement">+ Ajouter (clic carte)</button>
+                        <div class="manual-marker-list" id="manual-stationnements-list"></div>
+                    </div>
+                    
+                    <!-- Soumission -->
+                    <div class="manual-submit-section">
+                        <button class="manual-submit-btn" id="manual-submit">📤 Enregistrer ce questionnaire</button>
+                        <button class="manual-reset-btn" id="manual-reset">🗑️ Réinitialiser</button>
+                    </div>
                 </div>
             </aside>
         </div>
@@ -506,9 +808,21 @@
         const ZOOM_LEVEL = 15;
         
         let adminMap;
-        let allMarkers = { lieux: [], pointsNoirs: [], opportunites: [] };
+        let allMarkers = { lieux: [], securite: [], opportunites: [], stationnements: [] };
         let allData = [];
         let filteredData = [];
+        
+        // Saisie manuelle
+        let manualMode = false;
+        let manualData = {
+            etape1_lieux: [],
+            etape2_points_noirs: [],
+            etape4_opportunites: [],
+            etape5_stationnements: []
+        };
+        let manualMarkers = [];
+        let pendingMarkerType = null;
+        let tempMarker = null;
         
         function initAdminMap() {
             adminMap = L.map('admin-map', {
@@ -528,17 +842,45 @@
                 const div = L.DomUtil.create('div', 'map-legend');
                 div.innerHTML = `
                     <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;"></div>Lieux importants</div>
-                    <div class="legend-item"><div class="legend-dot" style="background:#E53935;"></div>Points noirs</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#E53935;"></div>Sécurité</div>
                     <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;"></div>Opportunités</div>
+                    <div class="legend-item"><div class="legend-dot" style="background:#10B981;"></div>Stationnements</div>
                 `;
                 return div;
             };
             legend.addTo(adminMap);
             
+            // Click handler pour saisie manuelle
+            adminMap.on('click', handleMapClick);
+            
             setTimeout(() => {
                 adminMap.invalidateSize();
                 adminMap.setView(BRECEY_CENTER, ZOOM_LEVEL);
             }, 100);
+        }
+        
+        function handleMapClick(e) {
+            if (!manualMode || !pendingMarkerType) return;
+            
+            const { lat, lng } = e.latlng;
+            
+            // Supprimer le marqueur temporaire précédent
+            if (tempMarker) {
+                adminMap.removeLayer(tempMarker);
+            }
+            
+            const colors = {
+                lieu: '#3B82F6',
+                securite: '#E53935',
+                opportunite: '#F59E0B',
+                stationnement: '#10B981'
+            };
+            
+            tempMarker = L.marker([lat, lng], {
+                icon: createColoredMarker(colors[pendingMarkerType])
+            }).addTo(adminMap);
+            
+            tempMarker.tempData = { lat, lng, type: pendingMarkerType };
         }
         
         function createColoredMarker(color) {
@@ -583,11 +925,10 @@
             
             filteredData = filterDataByDate(allData);
             
-            // Clear existing markers
             Object.values(allMarkers).forEach(arr => arr.forEach(m => adminMap.removeLayer(m)));
-            allMarkers = { lieux: [], pointsNoirs: [], opportunites: [] };
+            allMarkers = { lieux: [], securite: [], opportunites: [], stationnements: [] };
             
-            let stats = { participants: filteredData.length, lieux: 0, pointsNoirs: 0, opportunites: 0 };
+            let stats = { participants: filteredData.length, lieux: 0, securite: 0, opportunites: 0, stationnements: 0 };
             let html = '';
             
             filteredData.forEach(c => {
@@ -606,11 +947,11 @@
                 
                 if (data.etape2_points_noirs && Array.isArray(data.etape2_points_noirs)) {
                     data.etape2_points_noirs.forEach(p => {
-                        stats.pointsNoirs++;
+                        stats.securite++;
                         const m = L.marker([p.lat, p.lng], { icon: createColoredMarker('#E53935') })
-                            .bindPopup(`<strong>${p.type || 'Point noir'}</strong><br>${p.commentaire || ''}`);
-                        allMarkers.pointsNoirs.push(m);
-                        html += `<div class="contribution-item point-noir"><div class="contribution-type">🔴 ${p.type || 'Point noir'}</div><div class="contribution-text">${p.commentaire || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                            .bindPopup(`<strong>${p.type || 'Sécurité'}</strong><br>${p.commentaire || ''}`);
+                        allMarkers.securite.push(m);
+                        html += `<div class="contribution-item securite"><div class="contribution-type">🔴 ${p.type || 'Sécurité'}</div><div class="contribution-text">${p.commentaire || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
                     });
                 }
                 
@@ -623,15 +964,26 @@
                         html += `<div class="contribution-item opportunite"><div class="contribution-type">🟡 Opportunité</div><div class="contribution-text">${o.description || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
                     });
                 }
+                
+                if (data.etape5_stationnements && Array.isArray(data.etape5_stationnements)) {
+                    data.etape5_stationnements.forEach(s => {
+                        stats.stationnements++;
+                        const m = L.marker([s.lat, s.lng], { icon: createColoredMarker('#10B981') })
+                            .bindPopup(`<strong>Stationnement</strong><br>${s.pourquoi || ''}`);
+                        allMarkers.stationnements.push(m);
+                        html += `<div class="contribution-item stationnement"><div class="contribution-type">🟢 Stationnement</div><div class="contribution-text">${s.pourquoi || '-'}</div><div class="contribution-meta">${dateStr}</div></div>`;
+                    });
+                }
             });
             
             document.getElementById('stat-participants').textContent = stats.participants;
             document.getElementById('stat-lieux').textContent = stats.lieux;
-            document.getElementById('stat-points-noirs').textContent = stats.pointsNoirs;
+            document.getElementById('stat-securite').textContent = stats.securite;
             document.getElementById('stat-opportunites').textContent = stats.opportunites;
+            document.getElementById('stat-stationnements').textContent = stats.stationnements;
             
             if (html) {
-                list.innerHTML = `<h3 class="filter-title">📝 Contributions (${stats.lieux + stats.pointsNoirs + stats.opportunites})</h3>` + html;
+                list.innerHTML = `<h3 class="filter-title">📝 Contributions (${stats.lieux + stats.securite + stats.opportunites + stats.stationnements})</h3>` + html;
             } else {
                 list.innerHTML = `<h3 class="filter-title">📝 Contributions</h3><div class="no-data"><div class="no-data-icon">📭</div><p>Aucune contribution</p></div>`;
             }
@@ -641,11 +993,13 @@
         
         function applyTypeFilters() {
             const showL = document.getElementById('filter-lieux').checked;
-            const showP = document.getElementById('filter-points-noirs').checked;
+            const showS = document.getElementById('filter-securite').checked;
             const showO = document.getElementById('filter-opportunites').checked;
+            const showSt = document.getElementById('filter-stationnements').checked;
             allMarkers.lieux.forEach(m => showL ? m.addTo(adminMap) : adminMap.removeLayer(m));
-            allMarkers.pointsNoirs.forEach(m => showP ? m.addTo(adminMap) : adminMap.removeLayer(m));
+            allMarkers.securite.forEach(m => showS ? m.addTo(adminMap) : adminMap.removeLayer(m));
             allMarkers.opportunites.forEach(m => showO ? m.addTo(adminMap) : adminMap.removeLayer(m));
+            allMarkers.stationnements.forEach(m => showSt ? m.addTo(adminMap) : adminMap.removeLayer(m));
         }
         
         function setDatePreset(preset) {
@@ -678,12 +1032,17 @@
                 }
                 if (data.etape2_points_noirs) {
                     data.etape2_points_noirs.forEach(p => {
-                        csv += `"Point noir - ${p.type || ''}","${(p.commentaire || '').replace(/"/g, '""')}",${p.lat},${p.lng},"${dateStr}"\n`;
+                        csv += `"Sécurité - ${p.type || ''}","${(p.commentaire || '').replace(/"/g, '""')}",${p.lat},${p.lng},"${dateStr}"\n`;
                     });
                 }
                 if (data.etape4_opportunites) {
                     data.etape4_opportunites.forEach(o => {
                         csv += `"Opportunité","${(o.description || '').replace(/"/g, '""')}",${o.lat},${o.lng},"${dateStr}"\n`;
+                    });
+                }
+                if (data.etape5_stationnements) {
+                    data.etape5_stationnements.forEach(s => {
+                        csv += `"Stationnement","${(s.pourquoi || '').replace(/"/g, '""')}",${s.lat},${s.lng},"${dateStr}"\n`;
                     });
                 }
             });
@@ -717,10 +1076,226 @@
             }
         }
         
+        // ========== SAISIE MANUELLE ==========
+        
+        function switchMode(mode) {
+            manualMode = (mode === 'manual');
+            
+            document.getElementById('mode-view').classList.toggle('active', mode === 'view');
+            document.getElementById('mode-manual').classList.toggle('active', mode === 'manual');
+            document.getElementById('panel-view').classList.toggle('active', mode === 'view');
+            document.getElementById('panel-manual').classList.toggle('active', mode === 'manual');
+            
+            if (mode === 'view') {
+                clearManualMarkers();
+                loadContributions();
+            }
+        }
+        
+        function clearManualMarkers() {
+            manualMarkers.forEach(m => adminMap.removeLayer(m));
+            manualMarkers = [];
+            if (tempMarker) {
+                adminMap.removeLayer(tempMarker);
+                tempMarker = null;
+            }
+        }
+        
+        function renderManualList(type) {
+            const configs = {
+                lieu: { array: 'etape1_lieux', listId: 'manual-lieux-list', icon: '🔵' },
+                securite: { array: 'etape2_points_noirs', listId: 'manual-securite-list', icon: '🔴' },
+                opportunite: { array: 'etape4_opportunites', listId: 'manual-opportunites-list', icon: '🟡' },
+                stationnement: { array: 'etape5_stationnements', listId: 'manual-stationnements-list', icon: '🟢' }
+            };
+            
+            const config = configs[type];
+            const list = document.getElementById(config.listId);
+            const items = manualData[config.array];
+            
+            if (items.length === 0) {
+                list.innerHTML = '';
+                return;
+            }
+            
+            list.innerHTML = items.map((item, index) => {
+                const text = item.pourquoi || item.description || item.type || '-';
+                return `
+                    <div class="manual-marker-item">
+                        <span>${config.icon} ${text.substring(0, 30)}${text.length > 30 ? '...' : ''}</span>
+                        <button class="manual-marker-delete" onclick="removeManualMarker('${type}', ${index})">&times;</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function removeManualMarker(type, index) {
+            const configs = {
+                lieu: 'etape1_lieux',
+                securite: 'etape2_points_noirs',
+                opportunite: 'etape4_opportunites',
+                stationnement: 'etape5_stationnements'
+            };
+            
+            manualData[configs[type]].splice(index, 1);
+            
+            // Supprimer le marqueur de la carte
+            if (manualMarkers[index]) {
+                adminMap.removeLayer(manualMarkers[index]);
+                manualMarkers.splice(index, 1);
+            }
+            
+            renderManualList(type);
+        }
+        
+        function addManualMarker(type) {
+            if (!tempMarker || !tempMarker.tempData) {
+                alert('Cliquez d\'abord sur la carte pour placer un point');
+                return;
+            }
+            
+            const { lat, lng } = tempMarker.tempData;
+            
+            const configs = {
+                lieu: {
+                    array: 'etape1_lieux',
+                    textField: 'manual-lieu-text',
+                    max: 3,
+                    required: true,
+                    getData: () => ({ lat, lng, pourquoi: document.getElementById('manual-lieu-text').value.trim() })
+                },
+                securite: {
+                    array: 'etape2_points_noirs',
+                    textField: 'manual-securite-type',
+                    max: 3,
+                    required: true,
+                    getData: () => ({
+                        lat, lng,
+                        type: document.getElementById('manual-securite-type').value,
+                        commentaire: document.getElementById('manual-securite-comment').value.trim()
+                    })
+                },
+                opportunite: {
+                    array: 'etape4_opportunites',
+                    textField: 'manual-opportunite-text',
+                    max: 3,
+                    required: true,
+                    getData: () => ({ lat, lng, description: document.getElementById('manual-opportunite-text').value.trim() })
+                },
+                stationnement: {
+                    array: 'etape5_stationnements',
+                    textField: 'manual-stationnement-text',
+                    max: 3,
+                    required: true,
+                    getData: () => ({ lat, lng, pourquoi: document.getElementById('manual-stationnement-text').value.trim() })
+                }
+            };
+            
+            const config = configs[type];
+            
+            if (manualData[config.array].length >= config.max) {
+                alert(`Maximum ${config.max} points atteint pour cette catégorie`);
+                return;
+            }
+            
+            const data = config.getData();
+            
+            if (type === 'securite' && !data.type) {
+                alert('Sélectionnez un type de problème');
+                return;
+            }
+            
+            if (type !== 'securite' && !data.pourquoi && !data.description) {
+                alert('Remplissez le champ de description');
+                return;
+            }
+            
+            manualData[config.array].push(data);
+            manualMarkers.push(tempMarker);
+            tempMarker = null;
+            pendingMarkerType = null;
+            
+            // Reset fields
+            if (type === 'securite') {
+                document.getElementById('manual-securite-type').value = '';
+                document.getElementById('manual-securite-comment').value = '';
+            } else {
+                document.getElementById(config.textField).value = '';
+            }
+            
+            renderManualList(type);
+        }
+        
+        async function submitManualForm() {
+            // Validation
+            if (manualData.etape1_lieux.length < 1) {
+                alert('Ajoutez au moins 1 lieu important');
+                return;
+            }
+            if (manualData.etape2_points_noirs.length < 1) {
+                alert('Ajoutez au moins 1 point de sécurité');
+                return;
+            }
+            if (manualData.etape5_stationnements.length < 1) {
+                alert('Ajoutez au moins 1 stationnement souhaité');
+                return;
+            }
+            
+            const contribution = {
+                participant_id: 'admin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                etape1_lieux: manualData.etape1_lieux,
+                etape2_points_noirs: manualData.etape2_points_noirs,
+                etape3_itineraires: { selections: [], autre: null },
+                etape4_opportunites: manualData.etape4_opportunites,
+                etape5_stationnements: manualData.etape5_stationnements,
+                submitted: true,
+                submitted_at: new Date().toISOString(),
+                source: 'admin_manual'
+            };
+            
+            const synced = await Storage.syncToSupabase(contribution);
+            
+            if (synced) {
+                document.getElementById('manual-success').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('manual-success').style.display = 'none';
+                }, 3000);
+                
+                resetManualForm();
+            } else {
+                alert('Erreur lors de l\'enregistrement');
+            }
+        }
+        
+        function resetManualForm() {
+            manualData = {
+                etape1_lieux: [],
+                etape2_points_noirs: [],
+                etape4_opportunites: [],
+                etape5_stationnements: []
+            };
+            
+            clearManualMarkers();
+            
+            document.getElementById('manual-lieu-text').value = '';
+            document.getElementById('manual-securite-type').value = '';
+            document.getElementById('manual-securite-comment').value = '';
+            document.getElementById('manual-opportunite-text').value = '';
+            document.getElementById('manual-stationnement-text').value = '';
+            
+            renderManualList('lieu');
+            renderManualList('securite');
+            renderManualList('opportunite');
+            renderManualList('stationnement');
+        }
+        
         // Event listeners
         document.getElementById('filter-lieux').addEventListener('change', applyTypeFilters);
-        document.getElementById('filter-points-noirs').addEventListener('change', applyTypeFilters);
+        document.getElementById('filter-securite').addEventListener('change', applyTypeFilters);
         document.getElementById('filter-opportunites').addEventListener('change', applyTypeFilters);
+        document.getElementById('filter-stationnements').addEventListener('change', applyTypeFilters);
         document.getElementById('date-start').addEventListener('change', () => { document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active')); loadContributions(); });
         document.getElementById('date-end').addEventListener('change', () => { document.querySelectorAll('.date-preset').forEach(b => b.classList.remove('active')); loadContributions(); });
         document.querySelectorAll('.date-preset').forEach(b => b.addEventListener('click', () => setDatePreset(b.dataset.preset)));
@@ -728,6 +1303,42 @@
         document.getElementById('export-csv').addEventListener('click', exportCSV);
         document.getElementById('export-json').addEventListener('click', exportJSON);
         document.getElementById('export-image').addEventListener('click', exportImage);
+        
+        // Mode toggle
+        document.getElementById('mode-view').addEventListener('click', () => switchMode('view'));
+        document.getElementById('mode-manual').addEventListener('click', () => switchMode('manual'));
+        
+        // Manual add buttons
+        document.getElementById('manual-add-lieu').addEventListener('click', () => {
+            pendingMarkerType = 'lieu';
+            addManualMarker('lieu');
+        });
+        document.getElementById('manual-add-securite').addEventListener('click', () => {
+            pendingMarkerType = 'securite';
+            addManualMarker('securite');
+        });
+        document.getElementById('manual-add-opportunite').addEventListener('click', () => {
+            pendingMarkerType = 'opportunite';
+            addManualMarker('opportunite');
+        });
+        document.getElementById('manual-add-stationnement').addEventListener('click', () => {
+            pendingMarkerType = 'stationnement';
+            addManualMarker('stationnement');
+        });
+        
+        // Focus sur le type pour activer le clic carte
+        document.getElementById('manual-lieu-text').addEventListener('focus', () => { pendingMarkerType = 'lieu'; });
+        document.getElementById('manual-securite-type').addEventListener('focus', () => { pendingMarkerType = 'securite'; });
+        document.getElementById('manual-opportunite-text').addEventListener('focus', () => { pendingMarkerType = 'opportunite'; });
+        document.getElementById('manual-stationnement-text').addEventListener('focus', () => { pendingMarkerType = 'stationnement'; });
+        
+        // Submit & Reset
+        document.getElementById('manual-submit').addEventListener('click', submitManualForm);
+        document.getElementById('manual-reset').addEventListener('click', () => {
+            if (confirm('Réinitialiser le formulaire ?')) {
+                resetManualForm();
+            }
+        });
         
         // Init
         document.addEventListener('DOMContentLoaded', async () => {

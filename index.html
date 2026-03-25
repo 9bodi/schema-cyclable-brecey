@@ -48,7 +48,6 @@
             height: 100%;
         }
 
-        /* Logo vélo avec contour turquoise */
         .logo-velo {
             width: 130px;
             height: auto;
@@ -71,7 +70,6 @@
             50% { transform: translateY(-8px); }
         }
 
-        /* Description courte */
         .description {
             font-size: 1rem;
             color: var(--color-text-light);
@@ -79,7 +77,6 @@
             line-height: 1.5;
         }
 
-        /* Bouton CTA turquoise */
         .cta-button {
             display: inline-flex;
             align-items: center;
@@ -100,7 +97,6 @@
             box-shadow: 0 10px 30px rgba(42, 179, 164, 0.5);
         }
 
-        /* Section basse */
         .bottom-section {
             display: flex;
             flex-direction: column;
@@ -108,7 +104,6 @@
             gap: 10px;
         }
 
-        /* Wimoov */
         .wimoov-block {
             display: flex;
             flex-direction: column;
@@ -132,7 +127,6 @@
             color: var(--color-text-light);
         }
 
-        /* Partenaire */
         .partner-section {
             display: flex;
             flex-direction: column;
@@ -147,12 +141,17 @@
             letter-spacing: 1px;
         }
 
+        .partner-logos {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .partner-logo {
             height: 30px;
             opacity: 0.9;
         }
 
-        /* Responsive tablette/desktop */
         @media (min-width: 500px) {
             .main-container {
                 gap: 30px;
@@ -180,20 +179,16 @@
 </head>
 <body>
     <main class="main-container">
-        <!-- Logo campagne -->
         <img src="assets/logo-velo.png" alt="Brécey bouge autrement" class="logo-velo">
 
-        <!-- Description -->
         <p class="description">
             Votre avis compte pour améliorer les déplacements à vélo !
         </p>
 
-        <!-- Bouton -->
         <a href="questionnaire.html" class="cta-button">
             Je participe !
         </a>
 
-        <!-- Bas : Wimoov + Partenaire -->
         <div class="bottom-section">
             <div class="wimoov-block">
                 <img src="assets/logo-wimoov.png" alt="Wimoov" class="wimoov-logo">
@@ -203,7 +198,10 @@
 
             <div class="partner-section">
                 <p class="partner-label">Une démarche portée par</p>
-                <img src="assets/logo-altermob.png" alt="Alter.Mob" class="partner-logo">
+                <div class="partner-logos">
+                    <img src="assets/logo-altermob.png" alt="Alter.Mob" class="partner-logo">
+                    <img src="assets/abeil.jpg" alt="Abeil" class="partner-logo">
+                </div>
             </div>
         </div>
     </main>
