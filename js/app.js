@@ -14,13 +14,10 @@ const App = {
     limits: {
         1: { min: 1, max: 3 },
         2: { min: 1, max: 3 },
-        4: { min: 0, max: 3 },  // Optionnel
+        4: { min: 0, max: 3 },
         5: { min: 1, max: 3 }
     },
     
-    /**
-     * Initialise l'application
-     */
     init() {
         if (this.initialized) return;
         this.initialized = true;
@@ -34,61 +31,24 @@ const App = {
         console.log('App initialized', this.data);
     },
     
-    /**
-     * Attache tous les gestionnaires d'événements
-     */
     attachEventListeners() {
-        // Navigation entre étapes
         document.getElementById('next-1')?.addEventListener('click', () => this.goToNextStep(1));
         document.getElementById('next-2')?.addEventListener('click', () => this.goToNextStep(2));
         document.getElementById('next-3')?.addEventListener('click', () => this.goToNextStep(3));
         document.getElementById('next-4')?.addEventListener('click', () => this.goToNextStep(4));
         document.getElementById('submit')?.addEventListener('click', () => this.submitForm());
         
-        // Étape 1
         document.getElementById('add-marker-1')?.addEventListener('click', () => this.addLieu());
-        
-        // Étape 2
         document.getElementById('add-marker-2')?.addEventListener('click', () => this.addPointNoir());
-        
-        // Étape 4
         document.getElementById('add-marker-4')?.addEventListener('click', () => this.addOpportunite());
-        
-        // Étape 5
         document.getElementById('add-marker-5')?.addEventListener('click', () => this.addStationnement());
         
-        // Étape 3 - validation
         document.querySelectorAll('input[name="itineraire"]').forEach(cb => {
             cb.addEventListener('change', () => this.updateButtonState(3));
         });
         document.getElementById('other-itineraire')?.addEventListener('input', () => this.updateButtonState(3));
     },
     
-    /**
-     * Vérifie si un doublon existe
-     */
-    isDuplicate(stepNumber, text) {
-        const arrays = {
-            1: this.data.etape1_lieux,
-            2: this.data.etape2_points_noirs,
-            4: this.data.etape4_opportunites,
-            5: this.data.etape5_stationnements
-        };
-        
-        const arr = arrays[stepNumber];
-        if (!arr) return false;
-        
-        const normalizedText = text.toLowerCase().trim();
-        
-        return arr.some(item => {
-            const itemText = (item.pourquoi || item.commentaire || item.description || '').toLowerCase().trim();
-            return itemText === normalizedText;
-        });
-    },
-    
-    /**
-     * Vérifie si le max est atteint
-     */
     isMaxReached(stepNumber) {
         const arrays = {
             1: this.data.etape1_lieux,
@@ -103,9 +63,6 @@ const App = {
         return arr && limit && arr.length >= limit.max;
     },
     
-    /**
-     * Met à jour l'état du bouton
-     */
     updateButtonState(stepNumber) {
         let btn, isValid = false;
         
@@ -126,7 +83,7 @@ const App = {
                 break;
             case 4:
                 btn = document.getElementById('next-4');
-                isValid = true; // Optionnel
+                isValid = true;
                 break;
             case 5:
                 btn = document.getElementById('submit');
@@ -139,13 +96,9 @@ const App = {
             btn.classList.toggle('btn-disabled', !isValid);
         }
         
-        // Mise à jour de l'affichage du formulaire si max atteint
         this.updateInputVisibility(stepNumber);
     },
     
-    /**
-     * Cache le formulaire d'ajout si max atteint
-     */
     updateInputVisibility(stepNumber) {
         if (![1, 2, 4, 5].includes(stepNumber)) return;
         
@@ -159,17 +112,11 @@ const App = {
         }
     },
     
-    /**
-     * Passe à l'étape suivante
-     */
     goToNextStep(currentStep) {
         if (currentStep === 3) this.saveStep3();
         this.showStep(currentStep + 1);
     },
     
-    /**
-     * Affiche une étape
-     */
     showStep(stepNumber) {
         console.log('Showing step:', stepNumber);
         
@@ -197,9 +144,6 @@ const App = {
         setTimeout(() => this.updateButtonState(stepNumber), 100);
     },
     
-    /**
-     * Initialise la carte
-     */
     initStepMap(stepNumber) {
         const containerId = `map-${stepNumber}`;
         const container = document.getElementById(containerId);
@@ -231,16 +175,12 @@ const App = {
         }, 100);
     },
     
-    /**
-     * Configure les événements de la carte
-     */
     setupMapEvents(stepNumber, containerId) {
         const colors = { 1: '#3B82F6', 2: '#EF4444', 4: '#F59E0B', 5: '#10B981' };
         const inputGroups = { 1: 'input-group-1', 2: 'input-group-2', 4: 'input-group-4', 5: 'input-group-5' };
         const focusFields = { 1: 'comment-1', 2: 'problem-type', 4: 'comment-4', 5: 'comment-5' };
         
         MapManager.onMapClick(containerId, colors[stepNumber], (coords) => {
-            // Vérifier si max atteint
             if (this.isMaxReached(stepNumber)) {
                 this.showToast(`Maximum ${this.limits[stepNumber].max} points atteint`);
                 MapManager.cancelTempMarker(containerId);
@@ -253,9 +193,6 @@ const App = {
         });
     },
     
-    /**
-     * Charge les marqueurs existants
-     */
     loadMarkersForStep(stepNumber) {
         const configs = {
             1: { data: this.data.etape1_lieux, color: '#3B82F6' },
@@ -270,9 +207,6 @@ const App = {
         }
     },
     
-    /**
-     * Charge les données d'une étape
-     */
     loadStepData(stepNumber) {
         switch(stepNumber) {
             case 1:
@@ -298,18 +232,14 @@ const App = {
         }
     },
     
-    /**
-     * Affiche la liste des marqueurs
-     */
     renderMarkersList(stepNumber, items, itemClass) {
         const container = document.getElementById(`markers-list-${stepNumber}`);
         if (!container) return;
         
         const limit = this.limits[stepNumber];
-        const countText = limit ? ` (${items?.length || 0}/${limit.max})` : '';
         
         if (!items || items.length === 0) {
-            container.innerHTML = `<p class="no-markers">Aucun point ajouté. Cliquez sur la carte.${countText}</p>`;
+            container.innerHTML = `<p class="no-markers">Aucun point ajouté. Cliquez sur la carte.</p>`;
             return;
         }
         
@@ -336,9 +266,6 @@ const App = {
         }).join('');
     },
     
-    /**
-     * Supprime un marqueur
-     */
     deleteMarker(stepNumber, index) {
         const configs = {
             1: { array: 'etape1_lieux', class: 'lieu' },
@@ -356,9 +283,6 @@ const App = {
         this.showToast('Point supprimé');
     },
     
-    /**
-     * Ajoute un lieu (étape 1)
-     */
     addLieu() {
         const comment = document.getElementById('comment-1').value.trim();
         
@@ -368,10 +292,6 @@ const App = {
         }
         if (!comment) {
             this.showToast('Expliquez pourquoi ce lieu est important');
-            return;
-        }
-        if (this.isDuplicate(1, comment)) {
-            this.showToast('Cette réponse existe déjà');
             return;
         }
         if (this.isMaxReached(1)) {
@@ -393,9 +313,6 @@ const App = {
         this.showToast('Lieu ajouté !');
     },
     
-    /**
-     * Ajoute un point de sécurité (étape 2)
-     */
     addPointNoir() {
         const type = document.getElementById('problem-type').value;
         const comment = document.getElementById('comment-2').value.trim();
@@ -428,9 +345,6 @@ const App = {
         this.showToast('Point ajouté !');
     },
     
-    /**
-     * Ajoute une opportunité (étape 4)
-     */
     addOpportunite() {
         const desc = document.getElementById('comment-4').value.trim();
         
@@ -440,10 +354,6 @@ const App = {
         }
         if (!desc) {
             this.showToast('Décrivez cette opportunité');
-            return;
-        }
-        if (this.isDuplicate(4, desc)) {
-            this.showToast('Cette réponse existe déjà');
             return;
         }
         if (this.isMaxReached(4)) {
@@ -465,9 +375,6 @@ const App = {
         this.showToast('Opportunité ajoutée !');
     },
     
-    /**
-     * Ajoute un stationnement (étape 5)
-     */
     addStationnement() {
         const comment = document.getElementById('comment-5').value.trim();
         
@@ -477,10 +384,6 @@ const App = {
         }
         if (!comment) {
             this.showToast('Expliquez pourquoi cet emplacement');
-            return;
-        }
-        if (this.isDuplicate(5, comment)) {
-            this.showToast('Cette réponse existe déjà');
             return;
         }
         if (this.isMaxReached(5)) {
@@ -502,9 +405,6 @@ const App = {
         this.showToast('Stationnement ajouté !');
     },
     
-    /**
-     * Sauvegarde étape 3
-     */
     saveStep3() {
         const selections = Array.from(document.querySelectorAll('input[name="itineraire"]:checked')).map(cb => cb.value);
         const autre = document.getElementById('other-itineraire')?.value.trim();
@@ -512,9 +412,6 @@ const App = {
         Storage.saveData(this.data);
     },
     
-    /**
-     * Soumet le formulaire avec sync Supabase
-     */
     async submitForm() {
         if (this.data.etape5_stationnements.length < this.limits[5].min) {
             this.showToast('Ajoutez au moins un stationnement souhaité', 'error');
@@ -522,7 +419,6 @@ const App = {
         }
 
         const submitBtn = document.getElementById('submit');
-        const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Envoi en cours...';
         submitBtn.disabled = true;
 
@@ -547,9 +443,6 @@ const App = {
         }
     },
     
-    /**
-     * Toast notification
-     */
     showToast(message, type = 'info') {
         document.querySelector('.toast')?.remove();
         const toast = document.createElement('div');
