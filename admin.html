@@ -1062,19 +1062,51 @@
             link.download = `brecey-contributions-${new Date().toISOString().split('T')[0]}.json`;
             link.click();
         }
-        
         async function exportImage() {
-            try {
-                const canvas = await html2canvas(document.getElementById('admin-map'));
-                const link = document.createElement('a');
-                link.download = `brecey-carte-${new Date().toISOString().split('T')[0]}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-            } catch (error) {
-                alert('Erreur lors de la capture.');
-                console.error(error);
+    try {
+        // Afficher un message de chargement
+        const btn = document.getElementById('export-image');
+        const originalText = btn.textContent;
+        btn.textContent = '⏳ Capture en cours...';
+        btn.disabled = true;
+        
+        // Attendre que les tuiles soient chargées
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const mapContainer = document.getElementById('admin-map');
+        
+        const canvas = await html2canvas(mapContainer, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            scale: 2,
+            logging: false,
+            onclone: function(clonedDoc) {
+                // Forcer l'affichage des tuiles dans le clone
+                const clonedMap = clonedDoc.getElementById('admin-map');
+                if (clonedMap) {
+                    clonedMap.style.width = mapContainer.offsetWidth + 'px';
+                    clonedMap.style.height = mapContainer.offsetHeight + 'px';
+                }
             }
-        }
+        });
+        
+        const link = document.createElement('a');
+        link.download = `brecey-carte-${new Date().toISOString().split('T')[0]}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        btn.textContent = originalText;
+        btn.disabled = false;
+        
+    } catch (error) {
+        alert('Erreur lors de la capture. Essayez une capture d\'écran manuelle (Windows: Win+Shift+S)');
+        console.error(error);
+        document.getElementById('export-image').textContent = '📷 Capture';
+        document.getElementById('export-image').disabled = false;
+    }
+}
+
         
         // ========== SAISIE MANUELLE ==========
         
